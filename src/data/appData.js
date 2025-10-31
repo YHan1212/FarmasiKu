@@ -36,14 +36,15 @@ export const hasDangerousSymptoms = (symptoms) => {
 // Get step information for progress indicator
 export const getStepInfo = (step) => {
   const steps = {
-    'age': { number: 1, name: 'Enter Age', total: 7 },
-    'bodyPart': { number: 2, name: 'Select Body Part', total: 7 },
-    'symptom': { number: 3, name: 'Select Symptoms', total: 7 },
-    'assessment': { number: 3, name: 'Assess Symptoms', total: 7 },
-    'confirmation': { number: 4, name: 'Confirm Symptoms', total: 7 },
-    'medication': { number: 5, name: 'Medications', total: 7 },
-    'consultation': { number: 6, name: 'Consultation', total: 7 },
-    'success': { number: 7, name: 'Success', total: 7 }
+    'age': { number: 1, name: 'Enter Age', total: 8 },
+    'bodyPart': { number: 2, name: 'Select Body Part', total: 8 },
+    'symptom': { number: 3, name: 'Select Symptoms', total: 8 },
+    'assessment': { number: 3, name: 'Assess Symptoms', total: 8 },
+    'confirmation': { number: 4, name: 'Confirm Symptoms', total: 8 },
+    'medication': { number: 5, name: 'Medications', total: 8 },
+    'payment': { number: 6, name: 'Payment', total: 8 },
+    'consultation': { number: 7, name: 'Consultation', total: 8 },
+    'success': { number: 8, name: 'Success', total: 8 }
   }
   return steps[step] || steps['age']
 }

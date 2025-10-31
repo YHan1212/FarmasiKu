@@ -5,6 +5,7 @@ import SymptomSelection from './components/SymptomSelection'
 import SymptomConfirmation from './components/SymptomConfirmation'
 import SymptomAssessment from './components/SymptomAssessment'
 import MedicationRecommendation from './components/MedicationRecommendation'
+import Payment from './components/Payment'
 import ConsultationRedirect from './components/ConsultationRedirect'
 import OrderSuccess from './components/OrderSuccess'
 import ProgressIndicator from './components/ProgressIndicator'
@@ -14,7 +15,7 @@ import { bodyParts, symptomsByBodyPart, medicationsBySymptoms, hasDangerousSympt
 import './styles/App.css'
 
 function App() {
-  const [step, setStep] = useState('age') // age, bodyPart, symptom, assessment, confirmation, medication, consultation, success
+  const [step, setStep] = useState('age') // age, bodyPart, symptom, assessment, confirmation, medication, payment, consultation, success
   const [userAge, setUserAge] = useState(null)
   const [selectedBodyPart, setSelectedBodyPart] = useState(null)
   const [selectedSymptoms, setSelectedSymptoms] = useState([])
@@ -23,6 +24,7 @@ function App() {
   const [isSelectingMore, setIsSelectingMore] = useState(false)
   const [currentSymptomForAssessment, setCurrentSymptomForAssessment] = useState(null)
   const [showDangerWarning, setShowDangerWarning] = useState(false)
+  const [selectedMedications, setSelectedMedications] = useState([])
 
   // Handle age input
   const handleAgeContinue = (age) => {
@@ -143,11 +145,19 @@ function App() {
       setStep('symptom')
     } else if (step === 'medication') {
       setStep('confirmation')
+    } else if (step === 'payment') {
+      setStep('medication')
     }
   }
 
-  // Handle order
-  const handleOrder = () => {
+  // Handle order - go to payment page
+  const handleOrder = (medications) => {
+    setSelectedMedications(medications)
+    setStep('payment')
+  }
+
+  // Handle payment
+  const handlePayment = (paymentInfo) => {
     setStep('success')
   }
 
@@ -162,6 +172,7 @@ function App() {
     setIsSelectingMore(false)
     setCurrentSymptomForAssessment(null)
     setShowDangerWarning(false)
+    setSelectedMedications([])
   }
 
   // Get step info for progress indicator
@@ -245,14 +256,24 @@ function App() {
           />
         )}
 
+        {step === 'payment' && selectedMedications.length > 0 && (
+          <Payment
+            medications={selectedMedications}
+            totalPrice={selectedMedications.reduce((sum, m) => sum + m.price, 0)}
+            onPay={handlePayment}
+            onBack={handleBack}
+          />
+        )}
+
         {step === 'consultation' && (
           <ConsultationRedirect
             onBack={() => setStep('confirmation')}
           />
         )}
 
-        {step === 'success' && (
+        {step === 'success' && selectedMedications.length > 0 && (
           <OrderSuccess
+            medications={selectedMedications}
             onReset={handleReset}
           />
         )}
@@ -262,4 +283,5 @@ function App() {
 }
 
 export default App
+
 

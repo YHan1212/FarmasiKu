@@ -2,19 +2,22 @@ import React, { useState } from 'react'
 import './MedicationRecommendation.css'
 
 function MedicationRecommendation({ symptoms, medications, userAge, onOrder }) {
-  const [selectedMedication, setSelectedMedication] = useState(null)
-  const [expandedMedications, setExpandedMedications] = useState({})
+  const [selectedMedications, setSelectedMedications] = useState([])
 
-  const handleOrder = (medication) => {
-    setSelectedMedication(medication)
-    onOrder(medication)
+  const toggleMedication = (medication) => {
+    if (medication.restricted) return // Don't allow selection of restricted medications
+    
+    if (selectedMedications.some(m => m.name === medication.name)) {
+      setSelectedMedications(selectedMedications.filter(m => m.name !== medication.name))
+    } else {
+      setSelectedMedications([...selectedMedications, medication])
+    }
   }
 
-  const toggleExpanded = (index) => {
-    setExpandedMedications({
-      ...expandedMedications,
-      [index]: !expandedMedications[index]
-    })
+  const handleProceedToPayment = () => {
+    if (selectedMedications.length > 0) {
+      onOrder(selectedMedications)
+    }
   }
 
   const getAgeCategoryLabel = (category) => {
@@ -22,6 +25,12 @@ function MedicationRecommendation({ symptoms, medications, userAge, onOrder }) {
     if (category === 'elderly') return '👴 Elderly'
     return '👤 Adult'
   }
+
+  const isSelected = (medication) => {
+    return selectedMedications.some(m => m.name === medication.name)
+  }
+
+  const totalPrice = selectedMedications.reduce((sum, med) => sum + med.price, 0)
 
   return (
     <div className="medication-recommendation">
@@ -33,95 +42,81 @@ function MedicationRecommendation({ symptoms, medications, userAge, onOrder }) {
       </div>
 
       <div className="medications-list">
-        {medications.map((medication, index) => (
-          <div key={index} className={`medication-card ${medication.restricted ? 'restricted' : ''}`}>
-            <div className="medication-info">
-              <div className="medication-header">
-                <h3 className="medication-name">
-                  {medication.name}
-                  {medication.isChildAlternative && (
-                    <span className="alternative-badge">Child-Safe Alternative</span>
+        {medications.map((medication, index) => {
+          const selected = isSelected(medication)
+          return (
+            <div 
+              key={index} 
+              className={`medication-card ${medication.restricted ? 'restricted' : ''} ${selected ? 'selected' : ''}`}
+              onClick={() => !medication.restricted && toggleMedication(medication)}
+            >
+              {!medication.restricted && (
+                <div className="selection-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={selected}
+                    onChange={() => toggleMedication(medication)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="medication-checkbox"
+                  />
+                  <span className="checkmark">{selected ? '✓' : ''}</span>
+                </div>
+              )}
+              <div className="medication-info">
+                <div className="medication-header">
+                  <h3 className="medication-name">
+                    {medication.name}
+                    {medication.isChildAlternative && (
+                      <span className="alternative-badge">Child-Safe Alternative</span>
+                    )}
+                  </h3>
+                  {medication.ageCategory && (
+                    <span className="age-badge">{getAgeCategoryLabel(medication.ageCategory)}</span>
                   )}
-                </h3>
-                {medication.ageCategory && (
-                  <span className="age-badge">{getAgeCategoryLabel(medication.ageCategory)}</span>
+                </div>
+                <p className="medication-price">RM {medication.price.toFixed(2)}</p>
+                {medication.ageWarning && (
+                  <div className="age-warning">
+                    <span className="warning-icon">⚠️</span>
+                    <span className="warning-text">{medication.ageWarning}</span>
+                  </div>
+                )}
+                {medication.isChildAlternative && medication.originalMed && (
+                  <div className="alternative-info">
+                    <span className="info-icon">ℹ️</span>
+                    <span className="info-text">
+                      Replaces {medication.originalMed} (not suitable for children)
+                    </span>
+                  </div>
                 )}
               </div>
-              <p className="medication-price">RM {medication.price.toFixed(2)}</p>
-              {medication.ageWarning && (
-                <div className="age-warning">
-                  <span className="warning-icon">⚠️</span>
-                  <span className="warning-text">{medication.ageWarning}</span>
-                </div>
-              )}
-              {medication.isChildAlternative && medication.originalMed && (
-                <div className="alternative-info">
-                  <span className="info-icon">ℹ️</span>
-                  <span className="info-text">
-                    Replaces {medication.originalMed} (not suitable for children)
-                  </span>
-                </div>
-              )}
-              
-              {/* Usage Instructions */}
-              {medication.usage && (
-                <div className="usage-section">
-                  <button
-                    className="usage-toggle"
-                    onClick={() => toggleExpanded(index)}
-                  >
-                    <span className="usage-icon">{medication.usage.icon || '📋'}</span>
-                    <span className="usage-label">
-                      {expandedMedications[index] ? 'Hide' : 'Show'} Usage Instructions
-                    </span>
-                    <span className="toggle-icon">
-                      {expandedMedications[index] ? '▲' : '▼'}
-                    </span>
-                  </button>
-                  
-                  {expandedMedications[index] && (
-                    <div className="usage-details">
-                      <div className="usage-item">
-                        <span className="usage-key">Method:</span>
-                        <span className="usage-value">{medication.usage.methodLabel}</span>
-                      </div>
-                      <div className="usage-item">
-                        <span className="usage-key">Dosage:</span>
-                        <span className="usage-value">{medication.usage.dosage}</span>
-                      </div>
-                      <div className="usage-item">
-                        <span className="usage-key">Frequency:</span>
-                        <span className="usage-value">{medication.usage.frequency}</span>
-                      </div>
-                      {medication.usage.maxDosage && (
-                        <div className="usage-item">
-                          <span className="usage-key">Max Dosage:</span>
-                          <span className="usage-value">{medication.usage.maxDosage}</span>
-                        </div>
-                      )}
-                      <div className="usage-item">
-                        <span className="usage-key">Duration:</span>
-                        <span className="usage-value">{medication.usage.duration}</span>
-                      </div>
-                      <div className="usage-instructions">
-                        <span className="instructions-label">Instructions:</span>
-                        <p className="instructions-text">{medication.usage.instructions}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
+              {medication.restricted && (
+                <button
+                  className="restricted-button"
+                  disabled={true}
+                >
+                  Consult Doctor First
+                </button>
               )}
             </div>
-            <button
-              className={`order-button ${medication.restricted ? 'restricted-button' : ''}`}
-              onClick={() => handleOrder(medication)}
-              disabled={medication.restricted}
-            >
-              {medication.restricted ? 'Consult Doctor First' : 'Order Now'}
-            </button>
-          </div>
-        ))}
+          )
+        })}
       </div>
+
+      {selectedMedications.length > 0 && (
+        <div className="selection-summary">
+          <div className="summary-info">
+            <span className="selected-count">{selectedMedications.length} medication(s) selected</span>
+            <span className="total-price">Total: RM {totalPrice.toFixed(2)}</span>
+          </div>
+          <button
+            className="proceed-button"
+            onClick={handleProceedToPayment}
+          >
+            Proceed to Payment
+          </button>
+        </div>
+      )}
 
       {medications.length === 0 && (
         <div className="no-medications">
