@@ -1,0 +1,40 @@
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.back-button:active {
+  transform: scale(0.98);
+}
+
+.back-icon {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.back-text {
+  font-size: 0.95rem;
+}
+
+@media (max-width: 480px) {
+  .back-button {
+    padding: 0.625rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+

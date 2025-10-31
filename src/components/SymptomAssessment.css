@@ -1,0 +1,220 @@
+.symptom-assessment {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.question-container {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: white;
+}
+
+.question-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.question-subtitle {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.assessment-form {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.assessment-item {
+  margin-bottom: 2rem;
+}
+
+.assessment-item:last-child {
+  margin-bottom: 0;
+}
+
+.assessment-label {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.intensity-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.intensity-slider {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: #e0e0e0;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.intensity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #667eea;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
+}
+
+.intensity-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #667eea;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
+}
+
+.intensity-value {
+  width: 50px;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #667eea;
+}
+
+.intensity-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #666;
+  padding: 0 0.5rem;
+}
+
+.duration-input {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.duration-number {
+  width: 80px;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.duration-number:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.duration-unit {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.duration-unit:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.frequency-options {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.frequency-button {
+  flex: 1;
+  padding: 0.875rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  color: #666;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.frequency-button.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.primary-button {
+  flex: 1;
+  background: white;
+  color: #667eea;
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.primary-button:active {
+  transform: scale(0.98);
+}
+
+.secondary-button {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  border: 2px solid white;
+  transition: all 0.3s ease;
+}
+
+.secondary-button:active {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 480px) {
+  .assessment-form {
+    padding: 1.25rem;
+  }
+  
+  .frequency-options {
+    flex-direction: column;
+  }
+  
+  .duration-input {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .duration-unit {
+    width: 100%;
+  }
+}
+

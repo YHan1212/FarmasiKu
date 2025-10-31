@@ -1,0 +1,144 @@
+.symptom-confirmation {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.question-container {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: white;
+}
+
+.question-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.question-subtitle {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.symptoms-list {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.symptom-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.symptom-item:last-child {
+  border-bottom: none;
+}
+
+.symptom-number {
+  width: 28px;
+  height: 28px;
+  background: #667eea;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.symptom-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.symptom-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.symptom-assessment-info {
+  margin-top: 0.25rem;
+}
+
+.assessment-badge {
+  display: inline-block;
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.confirmation-question {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.question-text {
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.primary-button {
+  background: white;
+  color: #667eea;
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.primary-button:active {
+  transform: scale(0.98);
+}
+
+.warning-button {
+  background: #ff6b6b;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+  transition: all 0.3s ease;
+}
+
+.warning-button:active {
+  transform: scale(0.98);
+  background: #ff5252;
+}
+
+@media (max-width: 480px) {
+  .question-title {
+    font-size: 1.5rem;
+  }
+  
+  .symptoms-list {
+    padding: 1rem;
+  }
+}
+
