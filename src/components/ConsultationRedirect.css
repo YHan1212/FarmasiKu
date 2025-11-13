@@ -77,21 +77,52 @@
   font-size: 0.95rem;
 }
 
+.consultation-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .consultation-button {
-  background: #667eea;
-  color: white;
   padding: 1rem 2rem;
   border-radius: 10px;
   font-size: 1.1rem;
   font-weight: 600;
   width: 100%;
   transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.consultation-button.primary {
+  background: #667eea;
+  color: white;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
-.consultation-button:active {
-  transform: scale(0.98);
+.consultation-button.primary:hover:not(:disabled) {
   background: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.consultation-button.secondary {
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+}
+
+.consultation-button.secondary:hover:not(:disabled) {
+  background: #f8f9fa;
+}
+
+.consultation-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.consultation-button:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 @media (max-width: 480px) {
