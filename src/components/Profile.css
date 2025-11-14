@@ -52,12 +52,12 @@
 }
 
 .tab-button:hover {
-  color: #667eea;
+  color: #3B82F6;
 }
 
 .tab-button.active {
-  color: #667eea;
-  border-bottom-color: #667eea;
+  color: #3B82F6;
+  border-bottom-color: #3B82F6;
 }
 
 .profile-content {
@@ -214,7 +214,7 @@
 }
 
 .order-total strong {
-  color: #667eea;
+  color: #3B82F6;
   font-size: 18px;
 }
 

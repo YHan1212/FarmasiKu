@@ -18,7 +18,7 @@
 }
 
 .back-btn {
-  background: #667eea;
+  background: #3B82F6;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -51,12 +51,12 @@
 }
 
 .filter-btn:hover {
-  border-color: #667eea;
-  color: #667eea;
+  border-color: #3B82F6;
+  color: #3B82F6;
 }
 
 .filter-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #3B82F6;
   color: white;
   border-color: transparent;
 }
@@ -74,7 +74,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: all 0.3s;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #3B82F6;
 }
 
 .session-card:hover {
@@ -163,6 +163,6 @@
 .loading {
   text-align: center;
   padding: 60px 20px;
-  color: #667eea;
+  color: #3B82F6;
 }
 

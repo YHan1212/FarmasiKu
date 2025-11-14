@@ -11,14 +11,14 @@ const bodyPartIcons = {
   'Other': '🔍'
 }
 
-// Body part colors for gradient backgrounds
+// Body part colors for gradient backgrounds - clean white with subtle blue
 const bodyPartColors = {
-  'Skin': { gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)', iconBg: '#ff9a9e' },
-  'Feet': { gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', iconBg: '#a8edea' },
-  'Head': { gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)', iconBg: '#ffecd2' },
-  'Chest': { gradient: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)', iconBg: '#ff6b6b' },
-  'Abdomen': { gradient: 'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)', iconBg: '#a1c4fd' },
-  'Other': { gradient: 'linear-gradient(135deg, #d299c2 0%, #fef9d7 100%)', iconBg: '#d299c2' }
+  'Skin': { gradient: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)', iconBg: '#3B82F6' },
+  'Feet': { gradient: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)', iconBg: '#3B82F6' },
+  'Head': { gradient: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)', iconBg: '#3B82F6' },
+  'Chest': { gradient: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)', iconBg: '#3B82F6' },
+  'Abdomen': { gradient: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)', iconBg: '#3B82F6' },
+  'Other': { gradient: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)', iconBg: '#3B82F6' }
 }
 
 function BodyPartSelection({ bodyParts, onSelect }) {
@@ -32,7 +32,7 @@ function BodyPartSelection({ bodyParts, onSelect }) {
       <div className="options-grid">
         {bodyParts.map((bodyPart, index) => {
           const icon = bodyPartIcons[bodyPart] || '📍'
-          const colors = bodyPartColors[bodyPart] || { gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', iconBg: '#667eea' }
+          const colors = bodyPartColors[bodyPart] || { gradient: 'linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%)', iconBg: '#3B82F6' }
           
           return (
             <button

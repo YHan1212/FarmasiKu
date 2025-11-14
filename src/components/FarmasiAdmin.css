@@ -1,6 +1,6 @@
 .admin-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #ffffff;
   padding: 20px;
 }
 
@@ -38,7 +38,7 @@
 }
 
 .back-button {
-  background: #667eea;
+  background: #3B82F6;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -54,7 +54,7 @@
 .back-button:hover {
   background: #5568d3;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
 }
 
 .admin-tabs {
@@ -83,9 +83,9 @@
 }
 
 .tab.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #3B82F6;
   color: white;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
 .admin-content {
@@ -110,30 +110,31 @@
 }
 
 .stat-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #EFF6FF;
   padding: 25px;
   border-radius: 15px;
   display: flex;
   align-items: center;
   gap: 20px;
-  color: white;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  color: #1E40AF;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #DBEAFE;
 }
 
 .stat-card.revenue {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: #EFF6FF;
 }
 
 .stat-card.orders {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  background: #EFF6FF;
 }
 
 .stat-card.users {
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  background: #EFF6FF;
 }
 
 .stat-card.consultations {
-  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  background: #EFF6FF;
 }
 
 .stat-icon {
@@ -205,7 +206,7 @@
 .activity-amount {
   font-size: 18px;
   font-weight: bold;
-  color: #667eea;
+  color: #3B82F6;
 }
 
 /* Orders Section */
@@ -240,7 +241,7 @@
 .filter-select:focus,
 .search-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #3B82F6;
 }
 
 .search-input {
@@ -294,7 +295,7 @@
 .order-total {
   font-size: 18px;
   font-weight: bold;
-  color: #667eea;
+  color: #3B82F6;
 }
 
 .status-badge {
@@ -341,7 +342,7 @@
 }
 
 .item-price {
-  color: #667eea;
+  color: #3B82F6;
   font-weight: 500;
 }
 
@@ -402,10 +403,12 @@
 }
 
 .consultation-card {
-  background: #f8f9fa;
+  background: white;
   padding: 20px;
   border-radius: 12px;
-  border-left: 4px solid #fa709a;
+  border: 1px solid #E5E7EB;
+  border-left: 4px solid #3B82F6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .consultation-header {
@@ -609,7 +612,7 @@
 }
 
 .edit-btn {
-  background: #667eea;
+  background: #3B82F6;
   color: white;
   border: none;
   padding: 6px 12px;
@@ -654,7 +657,7 @@
 
 .edit-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #3B82F6;
 }
 
 .edit-actions {
@@ -715,7 +718,7 @@
 }
 
 .add-doctor-btn {
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  background: #EFF6FF;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -771,7 +774,7 @@
 .form-input:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #3B82F6;
 }
 
 .form-textarea {
@@ -826,7 +829,7 @@
 
 .doctor-specialization {
   margin: 0;
-  color: #667eea;
+  color: #3B82F6;
   font-size: 14px;
   font-weight: 500;
 }
@@ -871,16 +874,52 @@
   gap: 10px;
 }
 
+.doctor-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+}
+
 .doctor-id {
   font-size: 11px;
   color: #999;
   font-family: monospace;
 }
 
+.doctor-linked {
+  font-size: 12px;
+  color: #28a745;
+  font-weight: 500;
+}
+
+.doctor-unlinked {
+  font-size: 12px;
+  color: #ffc107;
+  font-weight: 500;
+}
+
 .doctor-actions {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.link-user-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.link-user-btn:hover {
+  background: #218838;
+  transform: translateY(-1px);
 }
 
 .toggle-availability-btn {
@@ -934,7 +973,7 @@
 .loading {
   text-align: center;
   padding: 60px 20px;
-  color: #667eea;
+  color: #3B82F6;
   font-size: 16px;
 }
 

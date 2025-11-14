@@ -467,6 +467,48 @@ function FarmasiAdmin({ user, onBack }) {
     }
   }
 
+  const handleLinkDoctorToUser = async (doctorId) => {
+    if (!user?.id) {
+      alert('Please login first to link a doctor account.')
+      return
+    }
+
+    if (!confirm('Link this doctor account to your current user account? You will be able to reply to consultations as this doctor.')) {
+      return
+    }
+
+    try {
+      // Check if another doctor is already linked to this user
+      const { data: existingDoctor } = await supabase
+        .from('doctors')
+        .select('id, name')
+        .eq('user_id', user.id)
+        .single()
+
+      if (existingDoctor && existingDoctor.id !== doctorId) {
+        if (!confirm(`Another doctor (${existingDoctor.name}) is already linked to your account. Replace it with this doctor?`)) {
+          return
+        }
+      }
+
+      const { error } = await supabase
+        .from('doctors')
+        .update({
+          user_id: user.id,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', doctorId)
+
+      if (error) throw error
+
+      await loadDoctors()
+      alert('Doctor account linked successfully! You can now reply to consultations as this doctor.')
+    } catch (error) {
+      console.error('Error linking doctor to user:', error)
+      alert(`Failed to link doctor: ${error.message || 'Unknown error'}`)
+    }
+  }
+
   const filteredOrders = orders.filter(order => {
     if (!searchQuery) return true
     const query = searchQuery.toLowerCase()
@@ -1025,8 +1067,26 @@ function FarmasiAdmin({ user, onBack }) {
                             <p className="doctor-bio">{doctor.bio}</p>
                           )}
                           <div className="doctor-footer">
-                            <span className="doctor-id">ID: {doctor.id.substring(0, 8)}...</span>
+                            <div className="doctor-info">
+                              <span className="doctor-id">ID: {doctor.id.substring(0, 8)}...</span>
+                              {doctor.user_id ? (
+                                <span className="doctor-linked">
+                                  {doctor.user_id === user?.id ? '✓ Linked to your account' : '✓ Linked to another user'}
+                                </span>
+                              ) : (
+                                <span className="doctor-unlinked">⚠ Not linked to any user</span>
+                              )}
+                            </div>
                             <div className="doctor-actions">
+                              {!doctor.user_id && user?.id && (
+                                <button
+                                  className="link-user-btn"
+                                  onClick={() => handleLinkDoctorToUser(doctor.id)}
+                                  title="Link this doctor to your current account so you can reply to consultations"
+                                >
+                                  🔗 Link to My Account
+                                </button>
+                              )}
                               <button
                                 className="toggle-availability-btn"
                                 onClick={() => handleToggleDoctorAvailability(doctor.id, doctor.is_available)}

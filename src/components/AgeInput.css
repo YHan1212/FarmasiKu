@@ -7,7 +7,7 @@
 .question-container {
   text-align: center;
   margin-bottom: 2rem;
-  color: white;
+  color: #1E293B;
 }
 
 .question-title {
@@ -27,7 +27,8 @@
   border-radius: 12px;
   padding: 2rem;
   margin-bottom: 2rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #E5E7EB;
 }
 
 .input-wrapper {
@@ -51,8 +52,8 @@
 
 .age-input-field:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .age-input-field::placeholder {
@@ -120,14 +121,22 @@
 }
 
 .primary-button {
-  background: white;
-  color: #667eea;
+  background: #3B82F6;
+  color: white;
   padding: 1rem 2rem;
   border-radius: 10px;
   font-size: 1.1rem;
   font-weight: 600;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
   transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.primary-button:hover {
+  background: #2563EB;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
 }
 
 .primary-button:active {
@@ -145,9 +154,8 @@
 }
 
 .privacy-note p {
-  color: white;
+  color: #64748B;
   font-size: 0.85rem;
-  opacity: 0.8;
 }
 
 @media (max-width: 480px) {

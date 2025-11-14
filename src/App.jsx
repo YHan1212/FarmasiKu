@@ -17,7 +17,7 @@ import ForgotPassword from './components/ForgotPassword'
 import ResetPassword from './components/ResetPassword'
 import Profile from './components/Profile'
 import FarmasiAdmin from './components/FarmasiAdmin'
-import ConsultationList from './components/ConsultationList'
+import SimpleChat from './components/SimpleChat'
 import { supabase } from './lib/supabase'
 import { bodyParts, symptomsByBodyPart, medicationsBySymptoms, hasDangerousSymptoms, dangerousSymptoms, getStepInfo, getAgeCategory, getAgeRestrictions, medicationUsage } from './data/appData'
 import { databaseService } from './services/databaseService'
@@ -37,6 +37,8 @@ function App() {
   const [showDangerWarning, setShowDangerWarning] = useState(false)
   const [selectedMedications, setSelectedMedications] = useState([])
   const [recommendedMedications, setRecommendedMedications] = useState([])
+  const [isDoctor, setIsDoctor] = useState(false) // Track if current user is a doctor
+  const [currentConsultationSession, setCurrentConsultationSession] = useState(null) // Current chat session
 
   // Check authentication status on mount
   useEffect(() => {
@@ -77,8 +79,10 @@ function App() {
       if (session?.user) {
         setUser(session.user)
         setAuthStep('authenticated')
+        checkDoctorStatus(session.user.id)
       } else {
         setUser(null)
+        setIsDoctor(false)
         // Don't force login, allow guest access
         // setAuthStep('login')
       }
@@ -89,11 +93,43 @@ function App() {
     }
   }, [])
 
+  // Check if user is a doctor
+  const checkDoctorStatus = async (userId) => {
+    if (!userId || !supabase) return
+    
+    try {
+      const { data, error } = await supabase
+        .from('doctors')
+        .select('id')
+        .eq('user_id', userId)
+        .single()
+      
+      if (data && !error) {
+        setIsDoctor(true)
+      } else {
+        setIsDoctor(false)
+      }
+    } catch (error) {
+      // If no doctor found or other error, user is not a doctor
+      setIsDoctor(false)
+    }
+  }
+
+  // Check doctor status when user changes
+  useEffect(() => {
+    if (user?.id) {
+      checkDoctorStatus(user.id)
+    } else {
+      setIsDoctor(false)
+    }
+  }, [user?.id])
+
   // Handle authentication
   const handleLogin = (userData) => {
     if (userData) {
       setUser(userData)
       setAuthStep('authenticated')
+      checkDoctorStatus(userData.id)
     } else {
       // Continue as guest
       setAuthStep('authenticated')
@@ -103,10 +139,12 @@ function App() {
   const handleRegister = (userData) => {
     setUser(userData)
     setAuthStep('authenticated')
+    checkDoctorStatus(userData.id)
   }
 
   const handleLogout = () => {
     setUser(null)
+    setIsDoctor(false)
     setAuthStep('login')
     handleReset()
   }
@@ -124,13 +162,152 @@ function App() {
     handleReset()
   }
 
-  const handleShowConsultations = () => {
-    setStep('consultation-list')
+  // Load patient consultations
+  const handleShowPatientConsultations = async () => {
+    if (!user?.id) {
+      alert('Please login first')
+      return
+    }
+
+    try {
+      // Get latest active session or create new one
+      const { data: sessions } = await supabase
+        .from('consultation_sessions')
+        .select(`
+          *,
+          doctor:doctors(*)
+        `)
+        .eq('patient_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+
+      if (sessions && sessions.length > 0) {
+        setCurrentConsultationSession(sessions[0])
+        setStep('consultation-patient')
+      } else {
+        // Create new session
+        await handleStartConsultationChat()
+      }
+    } catch (error) {
+      console.error('Error loading consultations:', error)
+      await handleStartConsultationChat()
+    }
   }
 
-  const handleStartConsultation = (session) => {
-    setStep('consultation-list')
-    // The ConsultationList will handle showing the chat
+  // Load doctor consultations
+  const handleShowDoctorConsultations = async () => {
+    if (!user?.id) {
+      alert('Please login first')
+      return
+    }
+
+    try {
+      // Check if user is a doctor
+      const { data: doctorData } = await supabase
+        .from('doctors')
+        .select('id, name, user_id')
+        .eq('user_id', user.id)
+        .single()
+
+      if (!doctorData) {
+        alert('You are not registered as a doctor. Please contact admin.')
+        return
+      }
+
+      // Get latest session assigned to this doctor
+      const { data: sessions } = await supabase
+        .from('consultation_sessions')
+        .select(`
+          *,
+          doctor:doctors(*)
+        `)
+        .eq('doctor_id', doctorData.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+
+      if (sessions && sessions.length > 0) {
+        setCurrentConsultationSession(sessions[0])
+        setStep('consultation-doctor')
+      } else {
+        alert('No consultations assigned to you yet.')
+      }
+    } catch (error) {
+      console.error('Error loading doctor consultations:', error)
+      alert('Failed to load consultations.')
+    }
+  }
+
+  // Start consultation chat directly
+  const handleStartConsultationChat = async () => {
+    if (!user?.id) {
+      alert('Please login to start a consultation')
+      return
+    }
+
+    try {
+      // Get or create a default doctor
+      let doctorId = null
+      let doctorInfo = null
+      const { data: doctors } = await supabase
+        .from('doctors')
+        .select('id, name, user_id')
+        .eq('is_available', true)
+        .limit(1)
+
+      if (doctors && doctors.length > 0) {
+        doctorId = doctors[0].id
+        doctorInfo = doctors[0]
+      } else {
+        // Create a default doctor if none exists
+        const { data: newDoctor, error: doctorError } = await supabase
+          .from('doctors')
+          .insert({
+            name: 'Dr. Default',
+            specialization: 'General Practice',
+            bio: 'Available for consultations',
+            is_available: true
+          })
+          .select()
+          .single()
+
+        if (doctorError) {
+          console.error('Error creating doctor:', doctorError)
+          alert('Failed to start consultation. Please try again.')
+          return
+        }
+
+        doctorId = newDoctor.id
+        doctorInfo = newDoctor
+      }
+
+      // Create consultation session
+      const { data: session, error: sessionError } = await supabase
+        .from('consultation_sessions')
+        .insert({
+          patient_id: user.id,
+          doctor_id: doctorId,
+          symptoms: selectedSymptoms || [],
+          status: 'active'
+        })
+        .select(`
+          *,
+          doctor:doctors(*)
+        `)
+        .single()
+
+      if (sessionError) {
+        console.error('Error creating session:', sessionError)
+        alert('Failed to start consultation. Please try again.')
+        return
+      }
+
+      // Store session info and go to chat
+      setCurrentConsultationSession(session)
+      setStep('consultation-patient')
+    } catch (error) {
+      console.error('Error starting consultation:', error)
+      alert('Failed to start consultation. Please try again.')
+    }
   }
 
   // Handle age input
@@ -240,7 +417,8 @@ function App() {
     }
 
     if (isMoreSevere) {
-      setStep('consultation')
+      // Directly start consultation chat
+      await handleStartConsultationChat()
     } else {
       // Fetch medications from database or use fallback
       await loadMedications()
@@ -463,11 +641,18 @@ function App() {
           {user && (
             <div className="user-menu">
             <button 
-              className="consultation-button-header"
-              onClick={handleShowConsultations}
-              title="My Consultations"
+              className="consultation-patient-button-header"
+              onClick={handleShowPatientConsultations}
+              title="Patient Consultations"
             >
-              💬 Consultations
+              💬 Consultations (Patient)
+            </button>
+            <button 
+              className="consultation-doctor-button-header"
+              onClick={handleShowDoctorConsultations}
+              title="Doctor Consultations"
+            >
+              👨‍⚕️ Consultations (Doctor)
             </button>
             <button 
               className="admin-button"
@@ -573,18 +758,23 @@ function App() {
           />
         )}
 
-        {step === 'consultation' && (
-          <ConsultationRedirect
-            onBack={() => setStep('confirmation')}
-            symptoms={selectedSymptoms}
-            onStartConsultation={handleStartConsultation}
+        {step === 'consultation-patient' && user && currentConsultationSession && (
+          <SimpleChat
+            user={user}
+            onBack={() => setStep('age')}
+            sessionId={currentConsultationSession.id}
+            isDoctor={false}
+            otherUserInfo={currentConsultationSession.doctor || { name: 'Doctor' }}
           />
         )}
 
-        {step === 'consultation-list' && user && (
-          <ConsultationList
+        {step === 'consultation-doctor' && user && currentConsultationSession && (
+          <SimpleChat
             user={user}
             onBack={() => setStep('age')}
+            sessionId={currentConsultationSession.id}
+            isDoctor={true}
+            otherUserInfo={{ email: 'Patient' }}
           />
         )}
 

@@ -7,7 +7,7 @@
 .question-container {
   text-align: center;
   margin-bottom: 2rem;
-  color: white;
+  color: #1E293B;
 }
 
 .question-title {
@@ -41,14 +41,14 @@
 
 .symptom-button {
   background: white;
-  border: 2px solid transparent;
+  border: 1px solid #E5E7EB;
   border-radius: 16px;
   padding: 1.25rem 1.5rem;
   display: flex;
   align-items: center;
   gap: 1rem;
   text-align: left;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   position: relative;
@@ -73,7 +73,7 @@
 .symptom-button:hover {
   transform: translateX(5px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  border-color: #667eea;
+  border-color: #3B82F6;
 }
 
 .symptom-button:active {
@@ -81,16 +81,16 @@
 }
 
 .symptom-button.selected {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #3B82F6;
   color: white;
-  box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
-  border-color: #667eea;
+  box-shadow: 0 6px 25px rgba(59, 130, 246, 0.5);
+  border-color: #3B82F6;
   transform: translateX(0);
 }
 
 .symptom-button.selected:hover {
   transform: translateX(5px);
-  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.6);
 }
 
 .checkbox {
@@ -110,13 +110,13 @@
 }
 
 .symptom-button:hover .checkbox {
-  border-color: #667eea;
+  border-color: #3B82F6;
   background: #f0f0ff;
 }
 
 .symptom-button.selected .checkbox {
   background: white;
-  color: #667eea;
+  color: #3B82F6;
   border-color: white;
   transform: scale(1.1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -156,7 +156,7 @@
 
 .selected-tag {
   background: white;
-  color: #667eea;
+  color: #3B82F6;
   padding: 0.5rem 1rem;
   border-radius: 25px;
   font-size: 0.85rem;
@@ -225,14 +225,14 @@
 }
 
 .primary-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #3B82F6;
   color: white;
   padding: 1.1rem 2rem;
   border: none;
   border-radius: 12px;
   font-size: 1.1rem;
   font-weight: 600;
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   letter-spacing: 0.3px;
@@ -240,7 +240,7 @@
 
 .primary-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
 }
 
 .primary-button:active {
@@ -254,18 +254,28 @@
 }
 
 .secondary-button {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+  background: white;
+  color: #3B82F6;
   padding: 0.875rem 2rem;
   border-radius: 10px;
   font-size: 1rem;
   font-weight: 500;
-  border: 2px solid white;
+  border: 2px solid #3B82F6;
   transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.secondary-button:hover {
+  background: #EFF6FF;
+  border-color: #2563EB;
+  color: #2563EB;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .secondary-button:active {
-  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0.98);
 }
 
 /* Inline Assessment Panel */
@@ -300,7 +310,7 @@
 .assessment-header h3 {
   margin: 0;
   font-size: 1.1rem;
-  color: #667eea;
+  color: #3B82F6;
   font-weight: 600;
 }
 
@@ -337,19 +347,19 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #667eea;
+  background: #3B82F6;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
 }
 
 .intensity-slider::-moz-range-thumb {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #667eea;
+  background: #3B82F6;
   cursor: pointer;
   border: none;
-  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
 }
 
 .intensity-labels {
@@ -377,7 +387,7 @@
 
 .duration-number-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #3B82F6;
 }
 
 .duration-unit-select {
@@ -393,7 +403,7 @@
 
 .duration-unit-select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #3B82F6;
 }
 
 .frequency-buttons {
@@ -415,19 +425,19 @@
 }
 
 .frequency-btn:hover {
-  border-color: #667eea;
-  color: #667eea;
+  border-color: #3B82F6;
+  color: #3B82F6;
 }
 
 .frequency-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #3B82F6;
   color: white;
-  border-color: #667eea;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  border-color: #3B82F6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
 
 .save-assessment-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #3B82F6;
   color: white;
   border: none;
   padding: 0.875rem 1.5rem;
@@ -436,13 +446,13 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
   margin-top: 0.5rem;
 }
 
 .save-assessment-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
 }
 
 .assessment-summary {
@@ -465,9 +475,9 @@
 .edit-assessment-btn {
   margin-left: auto;
   padding: 0.4rem 0.8rem;
-  background: rgba(102, 126, 234, 0.1);
-  color: #667eea;
-  border: 1px solid #667eea;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3B82F6;
+  border: 1px solid #3B82F6;
   border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 500;
@@ -476,7 +486,7 @@
 }
 
 .edit-assessment-btn:hover {
-  background: #667eea;
+  background: #3B82F6;
   color: white;
 }
 

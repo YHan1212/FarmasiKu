@@ -7,7 +7,7 @@
 .question-container {
   text-align: center;
   margin-bottom: 2rem;
-  color: white;
+  color: #1E293B;
 }
 
 .question-title {
@@ -24,10 +24,11 @@
 
 .order-summary {
   background: white;
+  border: 1px solid #E5E7EB;
   border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .summary-title {
@@ -55,7 +56,7 @@
 .item-price {
   font-size: 1rem;
   font-weight: 600;
-  color: #667eea;
+  color: #3B82F6;
 }
 
 .summary-total {
@@ -64,7 +65,7 @@
   align-items: center;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 2px solid #667eea;
+  border-top: 2px solid #3B82F6;
 }
 
 .total-label {
@@ -76,14 +77,15 @@
 .total-price {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #667eea;
+  color: #3B82F6;
 }
 
 .payment-form-container {
   background: white;
+  border: 1px solid #E5E7EB;
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   margin-bottom: 1rem;
 }
 
@@ -117,13 +119,13 @@
 }
 
 .method-button:hover {
-  border-color: #667eea;
+  border-color: #3B82F6;
   background: #f8f9ff;
 }
 
 .method-button.active {
-  border-color: #667eea;
-  background: #667eea;
+  border-color: #3B82F6;
+  background: #3B82F6;
   color: white;
 }
 
@@ -158,8 +160,8 @@
 .form-group input:focus,
 .ewallet-select:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .form-row {
@@ -195,19 +197,23 @@
 .back-button {
   flex: 1;
   padding: 1rem;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #3B82F6;
   border-radius: 10px;
   background: white;
   font-size: 1rem;
   font-weight: 500;
-  color: #666;
+  color: #3B82F6;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
 }
 
 .back-button:hover:not(:disabled) {
-  background: #f5f5f5;
-  border-color: #ccc;
+  background: #EFF6FF;
+  border-color: #2563EB;
+  color: #2563EB;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .back-button:disabled {
@@ -220,13 +226,13 @@
   padding: 1rem 2rem;
   border: none;
   border-radius: 10px;
-  background: #667eea;
+  background: #3B82F6;
   color: white;
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -236,7 +242,7 @@
 .pay-button:hover:not(:disabled) {
   background: #5568d3;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
 }
 
 .pay-button:active:not(:disabled) {

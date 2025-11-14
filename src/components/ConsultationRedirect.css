@@ -62,7 +62,7 @@
 .feature-icon {
   width: 24px;
   height: 24px;
-  background: #667eea;
+  background: #3B82F6;
   color: white;
   border-radius: 50%;
   display: flex;
@@ -95,21 +95,21 @@
 }
 
 .consultation-button.primary {
-  background: #667eea;
+  background: #3B82F6;
   color: white;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
 }
 
 .consultation-button.primary:hover:not(:disabled) {
   background: #5568d3;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
 }
 
 .consultation-button.secondary {
   background: white;
-  color: #667eea;
-  border: 2px solid #667eea;
+  color: #3B82F6;
+  border: 2px solid #3B82F6;
 }
 
 .consultation-button.secondary:hover:not(:disabled) {

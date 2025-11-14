@@ -1,11 +1,11 @@
-.consultation-chat-container {
+.simple-chat-container {
   display: flex;
   flex-direction: column;
-  height: 80vh;
+  height: calc(100vh - 100px);
   max-height: 800px;
   background: white;
   border-radius: 15px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
@@ -13,41 +13,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  padding: 15px 20px;
   background: #3B82F6;
   color: white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .chat-header-info h3 {
-  margin: 0 0 5px 0;
-  font-size: 18px;
-}
-
-.chat-status {
   margin: 0;
-  font-size: 12px;
-  opacity: 0.9;
-}
-
-.chat-status span {
-  text-transform: capitalize;
-  font-weight: 500;
-}
-
-.status-pending {
-  color: #fff3cd;
-}
-
-.status-accepted {
-  color: #d4edda;
-}
-
-.status-active {
-  color: #d1ecf1;
-}
-
-.status-completed {
-  color: #d4edda;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .close-btn {
@@ -177,7 +152,7 @@
   border-radius: 25px;
   font-size: 14px;
   outline: none;
-  transition: all 0.3s;
+  transition: border-color 0.3s;
 }
 
 .chat-input:focus {
@@ -190,21 +165,21 @@
 }
 
 .send-btn {
+  padding: 12px 24px;
   background: #3B82F6;
   color: white;
   border: none;
-  padding: 12px 24px;
   border-radius: 25px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s;
-  white-space: nowrap;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .send-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  background: #2563EB;
 }
 
 .send-btn:disabled {
@@ -212,7 +187,7 @@
   cursor: not-allowed;
 }
 
-/* Scrollbar styling */
+/* Scrollbar */
 .chat-messages::-webkit-scrollbar {
   width: 6px;
 }
@@ -230,23 +205,10 @@
   background: #555;
 }
 
-.chat-warning {
-  padding: 10px 20px;
-  background: #fff3cd;
-  color: #856404;
-  font-size: 12px;
-  text-align: center;
-  border-top: 1px solid #ffeaa7;
-}
-
-.chat-warning p {
-  margin: 0;
-}
-
 /* Responsive */
 @media (max-width: 768px) {
-  .consultation-chat-container {
-    height: 100vh;
+  .simple-chat-container {
+    height: calc(100vh - 80px);
     max-height: none;
     border-radius: 0;
   }

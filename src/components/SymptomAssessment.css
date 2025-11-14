@@ -68,19 +68,19 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #667eea;
+  background: #3B82F6;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
 }
 
 .intensity-slider::-moz-range-thumb {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #667eea;
+  background: #3B82F6;
   cursor: pointer;
   border: none;
-  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
 }
 
 .intensity-value {
@@ -88,7 +88,7 @@
   text-align: center;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #667eea;
+  color: #3B82F6;
 }
 
 .intensity-labels {
@@ -117,8 +117,8 @@
 
 .duration-number:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .duration-unit {
@@ -134,8 +134,8 @@
 
 .duration-unit:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .frequency-options {
@@ -156,10 +156,10 @@
 }
 
 .frequency-button.active {
-  background: #667eea;
+  background: #3B82F6;
   color: white;
-  border-color: #667eea;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  border-color: #3B82F6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
 
 .action-buttons {
@@ -169,14 +169,22 @@
 
 .primary-button {
   flex: 1;
-  background: white;
-  color: #667eea;
+  background: #3B82F6;
+  color: white;
   padding: 1rem 2rem;
   border-radius: 10px;
   font-size: 1.1rem;
   font-weight: 600;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
   transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.primary-button:hover {
+  background: #2563EB;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
 }
 
 .primary-button:active {
@@ -185,18 +193,28 @@
 
 .secondary-button {
   flex: 1;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+  background: white;
+  color: #3B82F6;
   padding: 1rem 2rem;
   border-radius: 10px;
   font-size: 1rem;
   font-weight: 500;
-  border: 2px solid white;
+  border: 2px solid #3B82F6;
   transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.secondary-button:hover {
+  background: #EFF6FF;
+  border-color: #2563EB;
+  color: #2563EB;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .secondary-button:active {
-  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0.98);
 }
 
 @media (max-width: 480px) {

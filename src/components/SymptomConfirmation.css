@@ -7,7 +7,7 @@
 .question-container {
   text-align: center;
   margin-bottom: 2rem;
-  color: white;
+  color: #1E293B;
 }
 
 .question-title {
@@ -27,7 +27,8 @@
   border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 2rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #E5E7EB;
 }
 
 .symptom-item {
@@ -45,7 +46,7 @@
 .symptom-number {
   width: 28px;
   height: 28px;
-  background: #667eea;
+  background: #3B82F6;
   color: white;
   border-radius: 50%;
   display: flex;
@@ -102,14 +103,22 @@
 }
 
 .primary-button {
-  background: white;
-  color: #667eea;
+  background: #3B82F6;
+  color: white;
   padding: 1rem 2rem;
   border-radius: 10px;
   font-size: 1.1rem;
   font-weight: 600;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
   transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.primary-button:hover {
+  background: #2563EB;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
 }
 
 .primary-button:active {
