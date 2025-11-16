@@ -22,6 +22,55 @@
   opacity: 0.9;
 }
 
+/* Mobile optimization for Samsung S8+ */
+@media (max-width: 768px) {
+  .question-container {
+    margin-bottom: 1.5rem;
+  }
+
+  .question-title {
+    font-size: 1.4rem;
+  }
+
+  .question-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .medication-card {
+    padding: 1.25rem;
+  }
+
+  .medication-name {
+    font-size: 1.1rem;
+  }
+
+  .medication-price {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .question-title {
+    font-size: 1.25rem;
+  }
+
+  .question-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .medication-card {
+    padding: 1rem;
+  }
+
+  .medication-name {
+    font-size: 1rem;
+  }
+
+  .medication-price {
+    font-size: 1.1rem;
+  }
+}
+
 .medications-list {
   display: flex;
   flex-direction: column;

@@ -122,9 +122,42 @@
   color: #2563EB;
 }
 
-@media (max-width: 480px) {
+/* Mobile optimization for Samsung S8+ */
+@media (max-width: 768px) {
+  .register-container {
+    padding: 15px;
+  }
+
   .register-card {
-    padding: 24px;
+    padding: 28px;
+  }
+
+  .register-card h2 {
+    font-size: 22px;
+  }
+
+  .register-button {
+    padding: 12px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-container {
+    padding: 10px;
+  }
+
+  .register-card {
+    padding: 20px;
+  }
+
+  .register-card h2 {
+    font-size: 20px;
+  }
+
+  .register-button {
+    padding: 12px;
+    font-size: 14px;
   }
 }
 

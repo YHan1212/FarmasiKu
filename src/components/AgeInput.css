@@ -158,9 +158,45 @@
   font-size: 0.85rem;
 }
 
-@media (max-width: 480px) {
+/* Mobile optimization for Samsung S8+ */
+@media (max-width: 768px) {
+  .question-container {
+    margin-bottom: 1.5rem;
+  }
+
+  .question-title {
+    font-size: 1.4rem;
+  }
+
+  .question-subtitle {
+    font-size: 0.9rem;
+  }
+
   .age-input-container {
     padding: 1.5rem;
+  }
+
+  .age-input-field {
+    font-size: 1.5rem;
+  }
+
+  .primary-button {
+    padding: 0.9rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .question-title {
+    font-size: 1.25rem;
+  }
+
+  .question-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .age-input-container {
+    padding: 1.25rem;
   }
   
   .input-wrapper {
@@ -174,12 +210,17 @@
   
   .input-label {
     text-align: center;
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
   
   .age-category-info {
     flex-direction: column;
     gap: 0.75rem;
+  }
+
+  .primary-button {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.95rem;
   }
 }
 

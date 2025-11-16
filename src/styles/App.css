@@ -119,29 +119,42 @@
   background: #F8FAFC;
 }
 
-@media (max-width: 480px) {
+/* Mobile styles for Samsung S8+ and similar devices */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0.75rem;
+  }
+
+  .app-header h1 {
+    font-size: 1.25rem;
+  }
+
   .app-main {
     padding: 1rem;
+    padding-bottom: 1.5rem;
   }
 
   .user-menu {
     flex-wrap: wrap;
-    gap: 5px;
+    gap: 6px;
+    font-size: 0.875rem;
   }
 
   .consultation-patient-button-header,
   .consultation-doctor-button-header,
   .admin-button,
   .profile-button {
-    font-size: 12px;
-    padding: 6px 12px;
+    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: 16px;
   }
 
   .consultation-patient-button-header,
   .consultation-doctor-button-header {
     order: 1;
     white-space: normal;
-    font-size: 11px;
+    font-size: 10px;
+    padding: 5px 8px;
   }
 
   .admin-button {
@@ -150,7 +163,39 @@
 
   .profile-button {
     order: 3;
-    max-width: 100px;
+    max-width: 90px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header {
+    padding: 0.5rem;
+  }
+
+  .app-header h1 {
+    font-size: 1.1rem;
+  }
+
+  .app-main {
+    padding: 0.75rem;
+    padding-bottom: 1rem;
+  }
+
+  .user-menu {
+    gap: 4px;
+  }
+
+  .consultation-patient-button-header,
+  .consultation-doctor-button-header,
+  .admin-button,
+  .profile-button {
+    font-size: 9px;
+    padding: 4px 8px;
+  }
+
+  .profile-button {
+    max-width: 80px;
   }
 }
 
