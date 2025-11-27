@@ -80,6 +80,7 @@ function ForgotPassword({ onBack, onSwitchToLogin }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your.email@example.com"
+              autoComplete="email"
               required
               disabled={loading}
             />

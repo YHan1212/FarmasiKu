@@ -109,6 +109,7 @@ function ResetPassword({ onBack }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="At least 6 characters"
+              autoComplete="new-password"
               required
               minLength={6}
               disabled={loading}
@@ -123,6 +124,7 @@ function ResetPassword({ onBack }) {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Confirm your new password"
+              autoComplete="new-password"
               required
               minLength={6}
               disabled={loading}

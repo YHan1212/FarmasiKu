@@ -74,6 +74,7 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToForgotPassword }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your.email@example.com"
+              autoComplete="email"
               required
               disabled={loading}
             />
@@ -87,6 +88,7 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToForgotPassword }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
+              autoComplete="current-password"
               required
               disabled={loading}
             />

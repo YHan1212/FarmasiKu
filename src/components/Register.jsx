@@ -141,6 +141,7 @@ function Register({ onRegister, onSwitchToLogin }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your.email@example.com"
+              autoComplete="email"
               required
               disabled={loading}
             />
@@ -154,6 +155,7 @@ function Register({ onRegister, onSwitchToLogin }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="At least 6 characters"
+              autoComplete="new-password"
               required
               minLength={6}
               disabled={loading}
@@ -168,6 +170,7 @@ function Register({ onRegister, onSwitchToLogin }) {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Confirm your password"
+              autoComplete="new-password"
               required
               disabled={loading}
             />
