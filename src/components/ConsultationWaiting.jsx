@@ -219,10 +219,18 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
           status: 'active',
           started_at: new Date().toISOString()
         })
-        .select()
+        .select(`
+          *,
+          doctor:doctors(*)
+        `)
         .single()
 
-      if (sessionError) throw sessionError
+      if (sessionError) {
+        console.error('Error creating consultation session:', sessionError)
+        throw sessionError
+      }
+
+      console.log('Consultation session created successfully:', session)
 
       // 更新药剂师状态
       await supabase

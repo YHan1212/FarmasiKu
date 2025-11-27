@@ -255,23 +255,85 @@ function App() {
 
   // Load matched session and go to chat
   const loadMatchedSession = async (queue) => {
-    try {
-      const { data: session, error } = await supabase
-        .from('consultation_sessions')
-        .select(`
-          *,
-          doctor:doctors(*)
-        `)
-        .eq('queue_id', queue.id)
-        .single()
+    if (!supabase) {
+      alert('Database not configured')
+      return
+    }
 
-      if (error) throw error
+    // 重试逻辑：会话可能还在创建中
+    let retries = 5
+    let session = null
 
+    while (retries > 0 && !session) {
+      try {
+        // 首先尝试通过 queue_id 查找
+        let { data, error } = await supabase
+          .from('consultation_sessions')
+          .select(`
+            *,
+            doctor:doctors(*)
+          `)
+          .eq('queue_id', queue.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+
+        if (error && error.code !== 'PGRST116') {
+          // PGRST116 = no rows returned, 这是正常的
+          throw error
+        }
+
+        if (data) {
+          session = data
+          break
+        }
+
+        // 如果通过 queue_id 找不到，尝试通过 patient_id 和 doctor_id 查找
+        if (queue.matched_pharmacist_id) {
+          const { data: altData, error: altError } = await supabase
+            .from('consultation_sessions')
+            .select(`
+              *,
+              doctor:doctors(*)
+            `)
+            .eq('patient_id', user?.id)
+            .eq('doctor_id', queue.matched_pharmacist_id)
+            .eq('status', 'active')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+
+          if (altError && altError.code !== 'PGRST116') {
+            throw altError
+          }
+
+          if (altData) {
+            session = altData
+            break
+          }
+        }
+
+        // 如果还没找到，等待一下再重试
+        if (retries > 1) {
+          await new Promise(resolve => setTimeout(resolve, 1000))
+        }
+      } catch (error) {
+        console.error(`Error loading matched session (retry ${6 - retries}):`, error)
+        if (retries === 1) {
+          // 最后一次重试失败，显示详细错误
+          console.error('Final error loading session:', error)
+          alert(`Failed to load consultation session: ${error.message || 'Session not found. Please try again.'}`)
+          return
+        }
+      }
+      retries--
+    }
+
+    if (session) {
       setCurrentConsultationSession(session)
       setStep('consultation-patient')
-    } catch (error) {
-      console.error('Error loading matched session:', error)
-      alert('Failed to load consultation session')
+    } else {
+      alert('Consultation session not found. Please try again or contact support.')
     }
   }
 
