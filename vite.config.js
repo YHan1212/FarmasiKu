@@ -17,9 +17,6 @@ export default defineConfig({
         format: 'es'
       }
     }
-  },
-  define: {
-    'import.meta.env': JSON.stringify(process.env)
   }
 })
 
