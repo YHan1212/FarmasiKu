@@ -5,6 +5,16 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || ''
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
 
+// Debug: Log environment variables in development (not in production)
+if (import.meta.env.DEV) {
+  console.log('[Supabase Config] URL exists:', !!supabaseUrl, 'Length:', supabaseUrl?.length || 0)
+  console.log('[Supabase Config] Key exists:', !!supabaseAnonKey, 'Length:', supabaseAnonKey?.length || 0)
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.warn('[Supabase Config] ⚠️ Environment variables are missing!')
+    console.warn('[Supabase Config] Make sure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set in Vercel.')
+  }
+}
+
 // Check if Supabase is configured
 export const isSupabaseConfigured = supabaseUrl && supabaseAnonKey && 
   supabaseUrl !== '' && 
