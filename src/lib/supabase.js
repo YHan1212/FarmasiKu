@@ -16,8 +16,15 @@ export const isSupabaseConfigured = supabaseUrl && supabaseAnonKey &&
 const ENABLE_DB_LOGGING = import.meta.env.VITE_ENABLE_DB_LOGGING !== 'false'
 
 // Create Supabase client (only if configured)
+// Enable Realtime explicitly for real-time subscriptions
 export const supabase = isSupabaseConfigured 
-  ? createClient(supabaseUrl, supabaseAnonKey)
+  ? createClient(supabaseUrl, supabaseAnonKey, {
+      realtime: {
+        params: {
+          eventsPerSecond: 10
+        }
+      }
+    })
   : null
 
 // Get or create session ID for anonymous users
@@ -71,7 +78,11 @@ export const db = {
     const order = {
       ...orderData,
       session_id: getSessionId(),
-      user_id: orderData.user_id || null
+      user_id: orderData.user_id || null,
+      // Parse delivery_address if it's a string
+      delivery_address: typeof orderData.delivery_address === 'string' 
+        ? JSON.parse(orderData.delivery_address) 
+        : orderData.delivery_address
     }
     
     const { data: result, error } = await supabase

@@ -1,0 +1,268 @@
+.consultation-medication-review {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background: white;
+  min-height: calc(100vh - 200px);
+}
+
+.review-header {
+  text-align: center;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.review-header h2 {
+  color: #1e40af;
+  margin-bottom: 10px;
+  font-size: 28px;
+}
+
+.review-header .subtitle {
+  color: #64748b;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.review-header .back-btn {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.review-header .back-btn:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+.medications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.medication-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.2s;
+}
+
+.medication-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.medication-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.medication-header h3 {
+  color: #1e293b;
+  font-size: 20px;
+  margin: 0;
+}
+
+.medication-price {
+  color: #3b82f6;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.medication-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.detail-item {
+  display: flex;
+  gap: 10px;
+}
+
+.detail-item .label {
+  color: #64748b;
+  font-weight: 500;
+  min-width: 100px;
+}
+
+.detail-item .value {
+  color: #1e293b;
+  flex: 1;
+}
+
+.review-summary {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.summary-row.total {
+  border-top: 2px solid #cbd5e1;
+  margin-top: 10px;
+  padding-top: 15px;
+}
+
+.summary-label {
+  color: #475569;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.summary-row.total .summary-label {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.summary-value {
+  color: #1e293b;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.summary-row.total .summary-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+.review-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: space-between;
+}
+
+.review-actions .back-btn {
+  flex: 1;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 14px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.review-actions .back-btn:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+.review-actions .continue-btn {
+  flex: 2;
+  background: #3b82f6;
+  border: none;
+  color: white;
+  padding: 14px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.review-actions .continue-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.no-medications {
+  text-align: center;
+  padding: 60px 20px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.no-medications p {
+  color: #64748b;
+  font-size: 18px;
+  margin-bottom: 30px;
+}
+
+.no-medications .continue-btn {
+  background: #3b82f6;
+  border: none;
+  color: white;
+  padding: 14px 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.no-medications .continue-btn:hover {
+  background: #2563eb;
+}
+
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: #64748b;
+  font-size: 18px;
+}
+
+/* 移动端响应式 */
+@media (max-width: 768px) {
+  .consultation-medication-review {
+    padding: 15px;
+  }
+
+  .review-header h2 {
+    font-size: 24px;
+  }
+
+  .review-header .back-btn {
+    position: static;
+    margin-bottom: 15px;
+  }
+
+  .medication-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .medication-price {
+    font-size: 20px;
+  }
+
+  .review-actions {
+    flex-direction: column;
+  }
+
+  .review-actions .back-btn,
+  .review-actions .continue-btn {
+    width: 100%;
+  }
+}
+

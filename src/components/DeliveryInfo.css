@@ -1,0 +1,90 @@
+.delivery-info {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.delivery-info-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.delivery-info-header h2 {
+  color: #1E293B;
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #64748B;
+  font-size: 14px;
+}
+
+.delivery-content {
+  margin-bottom: 30px;
+}
+
+.delivery-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  padding-top: 20px;
+  border-top: 1px solid #E5E7EB;
+}
+
+.back-btn,
+.continue-btn {
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+}
+
+.back-btn {
+  background: white;
+  color: #3B82F6;
+  border: 2px solid #3B82F6;
+}
+
+.back-btn:hover {
+  background: #EFF6FF;
+  border-color: #2563EB;
+}
+
+.continue-btn {
+  background: #3B82F6;
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.continue-btn:hover:not(:disabled) {
+  background: #2563EB;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+.continue-btn:disabled {
+  background: #CBD5E1;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* 移动端响应式 */
+@media (max-width: 768px) {
+  .delivery-info {
+    padding: 16px;
+  }
+
+  .delivery-actions {
+    flex-direction: column;
+  }
+
+  .back-btn,
+  .continue-btn {
+    width: 100%;
+  }
+}
+

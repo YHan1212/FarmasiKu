@@ -346,6 +346,162 @@
   font-weight: 500;
 }
 
+.delivery-info-section {
+  background: #EFF6FF;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-left: 3px solid #3B82F6;
+}
+
+.delivery-address-info {
+  margin-bottom: 8px;
+}
+
+.delivery-address-info strong {
+  color: #1E293B;
+  font-size: 13px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.delivery-address-info p {
+  color: #64748B;
+  font-size: 13px;
+  margin: 2px 0;
+  line-height: 1.4;
+}
+
+.delivery-phone-info {
+  margin: 8px 0;
+  color: #1E293B;
+  font-size: 13px;
+}
+
+.delivery-phone-info strong {
+  color: #1E293B;
+}
+
+.estimated-delivery-info {
+  margin-top: 8px;
+  color: #3B82F6;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.estimated-delivery-info strong {
+  color: #3B82F6;
+}
+
+.order-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #E5E7EB;
+  flex-wrap: wrap;
+}
+
+.accept-order-btn,
+.prepare-order-btn,
+.deliver-order-btn {
+  background: #3B82F6;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.accept-order-btn:hover {
+  background: #2563EB;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.prepare-order-btn {
+  background: #10B981;
+}
+
+.prepare-order-btn:hover {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+.deliver-order-btn {
+  background: #F59E0B;
+}
+
+.deliver-order-btn:hover {
+  background: #D97706;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+}
+
+.delivery-status-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px;
+  background: #FEF3C7;
+  border-radius: 6px;
+  border-left: 3px solid #F59E0B;
+}
+
+.delivery-status-text {
+  color: #92400E;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.delivery-time-text {
+  color: #78350F;
+  font-size: 12px;
+}
+
+.delivered-status {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px;
+  background: #D1FAE5;
+  border-radius: 6px;
+  border-left: 3px solid #10B981;
+  color: #065F46;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.delivered-time {
+  font-size: 12px;
+  color: #047857;
+  font-weight: 400;
+}
+
+.status-accepted {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+
+.status-preparing {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.status-out_for_delivery {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.status-delivered {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
 .order-footer-admin {
   display: flex;
   justify-content: space-between;
@@ -363,6 +519,10 @@
 }
 
 .user-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
   background: #f8f9fa;
   padding: 20px;
   border-radius: 12px;
@@ -386,6 +546,13 @@
   color: #999;
 }
 
+.user-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
 .user-id {
   margin-top: 10px;
   padding-top: 10px;
@@ -393,6 +560,58 @@
   font-size: 11px;
   color: #999;
   font-family: monospace;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.role-badge.role-user {
+  background: #EFF6FF;
+  color: #1E40AF;
+}
+
+.role-badge.role-admin {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.role-toggle-btn {
+  background: #3B82F6;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.role-toggle-btn:hover {
+  background: #2563EB;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.role-toggle-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.role-toggle-btn.admin-active {
+  background: #EF4444;
+}
+
+.role-toggle-btn.admin-active:hover {
+  background: #DC2626;
 }
 
 /* Consultations Section */
@@ -906,20 +1125,39 @@
 }
 
 .link-user-btn {
-  background: #28a745;
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
   color: white;
   border: none;
-  padding: 6px 12px;
+  padding: 8px 16px;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
 }
 
 .link-user-btn:hover {
-  background: #218838;
   transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+}
+
+.unlink-user-btn {
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+.unlink-user-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.4);
 }
 
 .toggle-availability-btn {

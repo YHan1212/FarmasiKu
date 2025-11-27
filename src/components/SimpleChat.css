@@ -187,6 +187,52 @@
   cursor: not-allowed;
 }
 
+.chat-actions {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  border-top: 1px solid #E2E8F0;
+  background: #F8FAFC;
+}
+
+.recommend-medication-btn {
+  flex: 1;
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.recommend-medication-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.end-consultation-btn {
+  position: relative;
+  z-index: 10;
+  background: #F3F4F6;
+  color: #DC2626;
+  border: 2px solid #FCA5A5;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.end-consultation-btn:hover {
+  background: #FEE2E2;
+  border-color: #F87171;
+}
+
 /* Scrollbar */
 .chat-messages::-webkit-scrollbar {
   width: 6px;

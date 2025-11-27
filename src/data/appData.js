@@ -36,15 +36,17 @@ export const hasDangerousSymptoms = (symptoms) => {
 // Get step information for progress indicator
 export const getStepInfo = (step) => {
   const steps = {
-    'age': { number: 1, name: 'Enter Age', total: 8 },
-    'bodyPart': { number: 2, name: 'Select Body Part', total: 8 },
-    'symptom': { number: 3, name: 'Select Symptoms', total: 8 },
-    'assessment': { number: 3, name: 'Assess Symptoms', total: 8 },
-    'confirmation': { number: 4, name: 'Confirm Symptoms', total: 8 },
-    'medication': { number: 5, name: 'Medications', total: 8 },
-    'payment': { number: 6, name: 'Payment', total: 8 },
-    'consultation': { number: 7, name: 'Consultation', total: 8 },
-    'success': { number: 8, name: 'Success', total: 8 }
+    'age': { number: 1, name: 'Enter Age', total: 9 },
+    'bodyPart': { number: 2, name: 'Select Body Part', total: 9 },
+    'symptom': { number: 3, name: 'Select Symptoms', total: 9 },
+    'assessment': { number: 3, name: 'Assess Symptoms', total: 9 },
+    'confirmation': { number: 4, name: 'Confirm Symptoms', total: 9 },
+    'medication': { number: 5, name: 'Medications', total: 9 },
+    'consultation-review': { number: 5, name: 'Review Medications', total: 9 },
+    'delivery': { number: 6, name: 'Delivery Info', total: 9 },
+    'payment': { number: 7, name: 'Payment', total: 9 },
+    'consultation': { number: 8, name: 'Consultation', total: 9 },
+    'success': { number: 9, name: 'Success', total: 9 }
   }
   return steps[step] || steps['age']
 }

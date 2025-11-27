@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import AgeInput from './components/AgeInput'
 import BodyPartSelection from './components/BodyPartSelection'
 import SymptomSelection from './components/SymptomSelection'
@@ -6,7 +6,9 @@ import SymptomConfirmation from './components/SymptomConfirmation'
 import SymptomAssessment from './components/SymptomAssessment'
 import MedicationRecommendation from './components/MedicationRecommendation'
 import Payment from './components/Payment'
-import ConsultationRedirect from './components/ConsultationRedirect'
+import DeliveryInfo from './components/DeliveryInfo'
+import NotificationCenter from './components/NotificationCenter'
+import OrderTracking from './components/OrderTracking'
 import OrderSuccess from './components/OrderSuccess'
 import ProgressIndicator from './components/ProgressIndicator'
 import BackButton from './components/BackButton'
@@ -15,18 +17,22 @@ import Login from './components/Login'
 import Register from './components/Register'
 import ForgotPassword from './components/ForgotPassword'
 import ResetPassword from './components/ResetPassword'
+import Welcome from './components/Welcome'
 import Profile from './components/Profile'
 import FarmasiAdmin from './components/FarmasiAdmin'
 import SimpleChat from './components/SimpleChat'
+import ConsultationWaiting from './components/ConsultationWaiting'
+import ConsultationMedicationReview from './components/ConsultationMedicationReview'
 import { supabase } from './lib/supabase'
 import { bodyParts, symptomsByBodyPart, medicationsBySymptoms, hasDangerousSymptoms, dangerousSymptoms, getStepInfo, getAgeCategory, getAgeRestrictions, medicationUsage } from './data/appData'
 import { databaseService } from './services/databaseService'
+import { consultationService } from './services/consultationService'
 import './styles/App.css'
 
 function App() {
   const [user, setUser] = useState(null)
   const [authStep, setAuthStep] = useState('login') // 'login', 'register', 'forgot-password', 'reset-password', 'authenticated'
-  const [step, setStep] = useState('age') // age, bodyPart, symptom, assessment, confirmation, medication, payment, consultation, consultation-list, success, profile, admin
+  const [step, setStep] = useState('welcome') // welcome, age, bodyPart, symptom, assessment, confirmation, medication, delivery, payment, consultation, consultation-list, success, profile, admin, consultation-waiting, realtime-consultation, consultation-review
   const [userAge, setUserAge] = useState(null)
   const [selectedBodyPart, setSelectedBodyPart] = useState(null)
   const [selectedSymptoms, setSelectedSymptoms] = useState([])
@@ -38,13 +44,18 @@ function App() {
   const [selectedMedications, setSelectedMedications] = useState([])
   const [recommendedMedications, setRecommendedMedications] = useState([])
   const [isDoctor, setIsDoctor] = useState(false) // Track if current user is a doctor
+  const [userRole, setUserRole] = useState(null) // Track user role: 'user' or 'admin'
   const [currentConsultationSession, setCurrentConsultationSession] = useState(null) // Current chat session
+  const [deliveryInfo, setDeliveryInfo] = useState(null) // Store delivery address and phone
+  const [consultationQueue, setConsultationQueue] = useState(null) // Current consultation queue
+  const [showNotifications, setShowNotifications] = useState(false) // Show notification center
+  const [trackingOrderId, setTrackingOrderId] = useState(null) // Order ID for tracking
 
   // Check authentication status on mount
   useEffect(() => {
     if (!supabase) {
-      // If Supabase not configured, allow guest access
-      setAuthStep('authenticated')
+      // If Supabase not configured, still show login page but allow guest access
+      setAuthStep('login')
       return
     }
 
@@ -69,7 +80,7 @@ function App() {
         setUser(session.user)
         setAuthStep('authenticated')
       } else {
-        // No session, show login but allow guest access
+        // No session, show login page
         setAuthStep('login')
       }
     })
@@ -115,14 +126,71 @@ function App() {
     }
   }
 
-  // Check doctor status when user changes
+  // Check user role (user or admin)
+  const checkUserRole = async (userId) => {
+    if (!userId || !supabase) {
+      setUserRole(null)
+      return
+    }
+    
+    try {
+      // First, try to get the full profile to check if role field exists
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+      
+      console.log('User role check:', { userId, data, error })
+      
+      if (error) {
+        // If error is about column not existing, role field hasn't been added yet
+        if (error.message && error.message.includes('column') && error.message.includes('role')) {
+          console.log('Role column does not exist yet. Please run database script.')
+          setUserRole('user') // Default to user
+          return
+        }
+        // Other errors, default to user
+        console.log('Error fetching user role, defaulting to user:', error.message)
+        setUserRole('user')
+        return
+      }
+      
+      if (data) {
+        // Check if role field exists in the data
+        const role = data.role || 'user'
+        console.log('User role:', role)
+        setUserRole(role)
+      } else {
+        // No profile found, default to user
+        console.log('No profile found, defaulting to user')
+        setUserRole('user')
+      }
+    } catch (error) {
+      // Default to 'user' on error
+      console.error('Error checking user role:', error)
+      setUserRole('user')
+    }
+  }
+
+  // Check doctor status and user role when user changes
   useEffect(() => {
     if (user?.id) {
       checkDoctorStatus(user.id)
+      checkUserRole(user.id)
     } else {
       setIsDoctor(false)
+      setUserRole(null)
     }
   }, [user?.id])
+
+  // Redirect admin users to admin panel automatically
+  useEffect(() => {
+    if (userRole === 'admin' && user && step !== 'admin' && step !== 'profile') {
+      // 管理员登录后自动跳转到管理面板
+      setStep('admin')
+    }
+  }, [userRole, user, step])
 
   // Handle authentication
   const handleLogin = (userData) => {
@@ -130,9 +198,11 @@ function App() {
       setUser(userData)
       setAuthStep('authenticated')
       checkDoctorStatus(userData.id)
+      checkUserRole(userData.id)
     } else {
       // Continue as guest
       setAuthStep('authenticated')
+      setUserRole(null)
     }
   }
 
@@ -140,11 +210,18 @@ function App() {
     setUser(userData)
     setAuthStep('authenticated')
     checkDoctorStatus(userData.id)
+    checkUserRole(userData.id)
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // Sign out from Supabase
+    if (supabase) {
+      await supabase.auth.signOut()
+    }
+    // Clear local state
     setUser(null)
     setIsDoctor(false)
+    setUserRole(null)
     setAuthStep('login')
     handleReset()
   }
@@ -158,8 +235,131 @@ function App() {
   }
 
   const handleBackFromAdmin = () => {
-    setStep('age')
+    setStep('welcome')
     handleReset()
+  }
+
+  const handleRestartFlow = () => {
+    // Reset all flow state and go back to welcome step
+    handleReset()
+  }
+
+  // Start realtime consultation
+  const handleStartRealtimeConsultation = () => {
+    if (!user) {
+      alert('Please login first')
+      return
+    }
+    setStep('consultation-waiting')
+  }
+
+  // Load matched session and go to chat
+  const loadMatchedSession = async (queue) => {
+    try {
+      const { data: session, error } = await supabase
+        .from('consultation_sessions')
+        .select(`
+          *,
+          doctor:doctors(*)
+        `)
+        .eq('queue_id', queue.id)
+        .single()
+
+      if (error) throw error
+
+      setCurrentConsultationSession(session)
+      setStep('consultation-patient')
+    } catch (error) {
+      console.error('Error loading matched session:', error)
+      alert('Failed to load consultation session')
+    }
+  }
+
+  // Handle medication accepted from consultation
+  // 注意：这个函数现在只添加到临时列表，不直接跳转
+  // 用户需要点击"完成咨询"按钮才会进入确认页面
+  const handleMedicationAccepted = async (medication) => {
+    try {
+      // 获取药物价格
+      let price = 0
+      if (medication.medication_id) {
+        const { data: medData } = await supabase
+          .from('medications')
+          .select('price')
+          .eq('id', medication.medication_id)
+          .single()
+        
+        if (medData) {
+          price = parseFloat(medData.price || 0)
+        }
+      }
+
+      // 药物已通过 acceptMedication API 添加到数据库
+      // 这里不需要额外操作，等待用户完成咨询后统一处理
+      console.log('Medication accepted:', medication)
+    } catch (error) {
+      console.error('Error handling medication acceptance:', error)
+      alert('Failed to add medication to cart')
+    }
+  }
+
+  // Handle consultation completion - show medication review
+  const handleConsultationComplete = useCallback(() => {
+    console.log('[App] handleConsultationComplete called, setting step to consultation-review', {
+      currentStep: step,
+      hasSession: !!currentConsultationSession
+    })
+    // 跳转到药物确认页面
+    setStep('consultation-review')
+  }, [step, currentConsultationSession])
+
+  // Handle medication review continue - proceed to delivery
+  const handleMedicationReviewContinue = async (medications) => {
+    // 设置选中的药物
+    setSelectedMedications(medications)
+    
+    // 结束咨询会话
+    if (currentConsultationSession) {
+      try {
+        // 获取队列ID（如果会话中有）
+        let queueId = currentConsultationSession.queue_id
+        
+        // 如果没有，从数据库查询
+        if (!queueId) {
+          const { data: session } = await supabase
+            .from('consultation_sessions')
+            .select('queue_id')
+            .eq('id', currentConsultationSession.id)
+            .single()
+          
+          if (session?.queue_id) {
+            queueId = session.queue_id
+          }
+        }
+        
+        if (queueId) {
+          await consultationService.endConsultation(
+            currentConsultationSession.id,
+            queueId
+          )
+        } else {
+          // 如果没有队列ID，只更新会话状态
+          await supabase
+            .from('consultation_sessions')
+            .update({
+              status: 'completed',
+              ended_at: new Date().toISOString()
+            })
+            .eq('id', currentConsultationSession.id)
+        }
+      } catch (err) {
+        console.error('Error ending consultation:', err)
+        // 即使结束失败，也继续流程
+      }
+    }
+    
+    // 跳转到配送信息页面
+    setStep('delivery')
   }
 
   // Load patient consultations
@@ -185,12 +385,13 @@ function App() {
         setCurrentConsultationSession(sessions[0])
         setStep('consultation-patient')
       } else {
-        // Create new session
-        await handleStartConsultationChat()
+        // 使用 realtime consultation 流程
+        setStep('consultation-waiting')
       }
     } catch (error) {
       console.error('Error loading consultations:', error)
-      await handleStartConsultationChat()
+      // 使用 realtime consultation 流程
+      setStep('consultation-waiting')
     }
   }
 
@@ -210,7 +411,7 @@ function App() {
         .single()
 
       if (!doctorData) {
-        alert('You are not registered as a doctor. Please contact admin.')
+        alert('You are not registered as a pharmacist. Please contact admin.')
         return
       }
 
@@ -237,78 +438,6 @@ function App() {
     }
   }
 
-  // Start consultation chat directly
-  const handleStartConsultationChat = async () => {
-    if (!user?.id) {
-      alert('Please login to start a consultation')
-      return
-    }
-
-    try {
-      // Get or create a default doctor
-      let doctorId = null
-      let doctorInfo = null
-      const { data: doctors } = await supabase
-        .from('doctors')
-        .select('id, name, user_id')
-        .eq('is_available', true)
-        .limit(1)
-
-      if (doctors && doctors.length > 0) {
-        doctorId = doctors[0].id
-        doctorInfo = doctors[0]
-      } else {
-        // Create a default doctor if none exists
-        const { data: newDoctor, error: doctorError } = await supabase
-          .from('doctors')
-          .insert({
-            name: 'Dr. Default',
-            specialization: 'General Practice',
-            bio: 'Available for consultations',
-            is_available: true
-          })
-          .select()
-          .single()
-
-        if (doctorError) {
-          console.error('Error creating doctor:', doctorError)
-          alert('Failed to start consultation. Please try again.')
-          return
-        }
-
-        doctorId = newDoctor.id
-        doctorInfo = newDoctor
-      }
-
-      // Create consultation session
-      const { data: session, error: sessionError } = await supabase
-        .from('consultation_sessions')
-        .insert({
-          patient_id: user.id,
-          doctor_id: doctorId,
-          symptoms: selectedSymptoms || [],
-          status: 'active'
-        })
-        .select(`
-          *,
-          doctor:doctors(*)
-        `)
-        .single()
-
-      if (sessionError) {
-        console.error('Error creating session:', sessionError)
-        alert('Failed to start consultation. Please try again.')
-        return
-      }
-
-      // Store session info and go to chat
-      setCurrentConsultationSession(session)
-      setStep('consultation-patient')
-    } catch (error) {
-      console.error('Error starting consultation:', error)
-      alert('Failed to start consultation. Please try again.')
-    }
-  }
 
   // Handle age input
   const handleAgeContinue = (age) => {
@@ -417,8 +546,12 @@ function App() {
     }
 
     if (isMoreSevere) {
-      // Directly start consultation chat
-      await handleStartConsultationChat()
+      // 使用 realtime consultation 流程
+      if (!user) {
+        alert('Please login first to start consultation')
+        return
+      }
+      setStep('consultation-waiting')
     } else {
       // Fetch medications from database or use fallback
       await loadMedications()
@@ -512,10 +645,15 @@ function App() {
     }
   }
 
-  // Handle danger warning actions
+  // Handle danger warning actions - use realtime consultation
   const handleDangerWarningConsultation = () => {
+    if (!user) {
+      alert('Please login first')
+      return
+    }
     setShowDangerWarning(false)
-    setStep('consultation')
+    // 使用 realtime consultation 流程
+    setStep('consultation-waiting')
   }
 
   const handleDangerWarningContinue = () => {
@@ -533,7 +671,9 @@ function App() {
   // Handle back navigation
   const handleBack = () => {
     if (step === 'profile') {
-      setStep('age')
+      setStep('welcome')
+    } else if (step === 'age') {
+      setStep('welcome')
     } else if (step === 'bodyPart') {
       setStep('age')
     } else if (step === 'symptom') {
@@ -546,29 +686,47 @@ function App() {
       setStep('symptom')
     } else if (step === 'medication') {
       setStep('confirmation')
-    } else if (step === 'payment') {
+    } else if (step === 'delivery') {
       setStep('medication')
+    } else if (step === 'payment') {
+      setStep('delivery')
+    } else if (step === 'consultation-review') {
+      // 返回咨询聊天页面
+      if (currentConsultationSession) {
+        setStep('consultation-patient')
+      } else {
+        setStep('welcome')
+      }
     }
   }
 
-  // Handle order - go to payment page
+  // Handle order - go to delivery page first
   const handleOrder = (medications) => {
     setSelectedMedications(medications)
+    setStep('delivery')
+  }
+
+  // Handle delivery info - go to payment page
+  const handleDeliveryContinue = (deliveryData) => {
+    setDeliveryInfo(deliveryData)
     setStep('payment')
   }
 
   // Handle payment
   const handlePayment = async (paymentInfo) => {
-    // Save order to database (silently fails if DB not configured)
+    // Save order to database with delivery info
     try {
       await databaseService.saveOrder({
         medications: selectedMedications,
         paymentMethod: paymentInfo.paymentMethod,
         transactionId: paymentInfo.transactionId,
         userAge,
-        userId: user?.id || null
+        userId: user?.id || null,
+        deliveryAddress: deliveryInfo?.deliveryAddress || null,
+        phoneNumber: deliveryInfo?.phoneNumber || null
       })
     } catch (error) {
+      console.error('Error saving order:', error)
       // Silently continue - database errors won't interrupt user flow
     }
 
@@ -577,7 +735,7 @@ function App() {
 
   // Reset application
   const handleReset = () => {
-    setStep('age')
+    setStep('welcome')
     setUserAge(null)
     setSelectedBodyPart(null)
     setSelectedSymptoms([])
@@ -635,31 +793,47 @@ function App() {
 
   return (
     <div className="app">
-      {step !== 'admin' && (
+      {/* 管理员：只在非 admin 页面显示 header（admin 页面有自己的 header） */}
+      {userRole === 'admin' && user && step !== 'admin' && (
         <header className="app-header">
-          <h1>farmasiKu</h1>
-          {user && (
-            <div className="user-menu">
-            <button 
-              className="consultation-patient-button-header"
-              onClick={handleShowPatientConsultations}
-              title="Patient Consultations"
-            >
-              💬 Consultations (Patient)
-            </button>
-            <button 
-              className="consultation-doctor-button-header"
-              onClick={handleShowDoctorConsultations}
-              title="Doctor Consultations"
-            >
-              👨‍⚕️ Consultations (Doctor)
-            </button>
+          <h1>farmasiKu Admin</h1>
+          <div className="user-menu">
             <button 
               className="admin-button"
               onClick={handleShowAdmin}
               title="Admin Dashboard"
             >
-              🏥 Admin
+              🏥 Admin Dashboard
+            </button>
+            <button 
+              className="profile-button"
+              onClick={handleShowProfile}
+              title={user.email}
+            >
+              {user.user_metadata?.name || user.email?.split('@')[0] || 'Admin'}
+            </button>
+            <button 
+              className="logout-button-header"
+              onClick={handleLogout}
+              title="Logout"
+            >
+              🚪 Logout
+            </button>
+          </div>
+        </header>
+      )}
+      
+      {/* 普通用户：显示完整的 header */}
+      {userRole !== 'admin' && user && step !== 'admin' && (
+        <header className="app-header">
+          <h1>farmasiKu</h1>
+          <div className="user-menu">
+            <button 
+              className="notification-button"
+              onClick={() => setShowNotifications(true)}
+              title="Notifications"
+            >
+              🔔
             </button>
             <button 
               className="profile-button"
@@ -668,113 +842,168 @@ function App() {
             >
               {user.user_metadata?.name || user.email?.split('@')[0] || 'User'}
             </button>
-            </div>
-          )}
+          </div>
         </header>
       )}
 
       <main className="app-main">
-        {step !== 'admin' && step !== 'profile' && step !== 'consultation-list' && (
+        {/* 管理员：只显示管理功能，隐藏普通用户功能 */}
+        {userRole === 'admin' ? (
           <>
-            <ProgressIndicator 
-              currentStep={stepInfo.number} 
-              totalSteps={stepInfo.total}
-              stepName={stepInfo.name}
-            />
+            {step === 'admin' && user && (
+              <FarmasiAdmin
+                user={user}
+                onBack={handleBackFromAdmin}
+                onLogout={handleLogout}
+              />
+            )}
+            {step === 'profile' && user && (
+              <Profile
+                user={user}
+                onLogout={handleLogout}
+              />
+            )}
+          </>
+        ) : (
+          <>
+            {/* 普通用户：显示正常流程 */}
+            {step !== 'admin' && step !== 'profile' && step !== 'consultation-list' && step !== 'welcome' && 
+             step !== 'consultation-patient' && step !== 'consultation-doctor' && step !== 'consultation-waiting' && (
+              <>
+                <ProgressIndicator 
+                  currentStep={stepInfo.number} 
+                  totalSteps={stepInfo.total}
+                  stepName={stepInfo.name}
+                />
+                
+                {step !== 'age' && step !== 'success' && step !== 'consultation-review' && (
+                  <BackButton onClick={handleBack} />
+                )}
+
+                {showDangerWarning && selectedSymptoms.length > 0 && (
+                  <DangerWarning
+                    symptoms={selectedSymptoms.filter(s => dangerousSymptoms.includes(s))}
+                    onConsultation={handleDangerWarningConsultation}
+                    onContinue={handleDangerWarningContinue}
+                  />
+                )}
+              </>
+            )}
             
-            {step !== 'age' && step !== 'success' && (
-              <BackButton onClick={handleBack} />
+            {step === 'welcome' && (
+              <Welcome 
+                onStart={() => setStep('age')} 
+              />
             )}
 
-            {showDangerWarning && selectedSymptoms.length > 0 && (
-              <DangerWarning
-                symptoms={selectedSymptoms.filter(s => dangerousSymptoms.includes(s))}
-                onConsultation={handleDangerWarningConsultation}
-                onContinue={handleDangerWarningContinue}
+
+            {step === 'age' && (
+              <AgeInput onContinue={handleAgeContinue} />
+            )}
+
+            {step === 'bodyPart' && (
+              <BodyPartSelection
+                bodyParts={bodyParts}
+                onSelect={handleBodyPartSelect}
+              />
+            )}
+
+            {step === 'symptom' && (
+              <SymptomSelection
+                bodyPart={currentBodyPart || selectedBodyPart}
+                symptoms={symptomsByBodyPart[currentBodyPart || selectedBodyPart] || []}
+                selectedSymptoms={selectedSymptoms}
+                symptomAssessments={symptomAssessments}
+                onToggle={handleSymptomToggle}
+                onComplete={handleSymptomComplete}
+                onMoreSymptoms={handleMoreSymptoms}
+                onAssess={handleInlineAssessment}
+                isSelectingMore={isSelectingMore}
+              />
+            )}
+
+            {step === 'assessment' && currentSymptomForAssessment && (
+              <SymptomAssessment
+                symptom={currentSymptomForAssessment}
+                onComplete={handleAssessmentComplete}
+                onBack={() => {
+                  setStep('symptom')
+                  setCurrentSymptomForAssessment(null)
+                }}
+              />
+            )}
+
+            {step === 'confirmation' && (
+              <SymptomConfirmation
+                symptoms={selectedSymptoms}
+                symptomAssessments={symptomAssessments}
+                onConfirm={handleConfirmSymptoms}
+              />
+            )}
+
+            {step === 'medication' && (
+              <MedicationRecommendation
+                symptoms={selectedSymptoms}
+                medications={recommendedMedications}
+                userAge={userAge}
+                onOrder={handleOrder}
+              />
+            )}
+
+            {step === 'delivery' && user && selectedMedications.length > 0 && (
+              <DeliveryInfo
+                user={user}
+                onContinue={handleDeliveryContinue}
+                onBack={handleBack}
+              />
+            )}
+
+            {step === 'payment' && selectedMedications.length > 0 && deliveryInfo && (
+              <Payment
+                medications={selectedMedications}
+                totalPrice={selectedMedications.reduce((sum, m) => sum + m.price, 0)}
+                onPay={handlePayment}
+                onBack={handleBack}
               />
             )}
           </>
         )}
-        
-        {step === 'age' && (
-          <AgeInput onContinue={handleAgeContinue} />
-        )}
 
-        {step === 'bodyPart' && (
-          <BodyPartSelection
-            bodyParts={bodyParts}
-            onSelect={handleBodyPartSelect}
-          />
-        )}
-
-        {step === 'symptom' && (
-          <SymptomSelection
-            bodyPart={currentBodyPart || selectedBodyPart}
-            symptoms={symptomsByBodyPart[currentBodyPart || selectedBodyPart] || []}
-            selectedSymptoms={selectedSymptoms}
-            symptomAssessments={symptomAssessments}
-            onToggle={handleSymptomToggle}
-            onComplete={handleSymptomComplete}
-            onMoreSymptoms={handleMoreSymptoms}
-            onAssess={handleInlineAssessment}
-            isSelectingMore={isSelectingMore}
-          />
-        )}
-
-        {step === 'assessment' && currentSymptomForAssessment && (
-          <SymptomAssessment
-            symptom={currentSymptomForAssessment}
-            onComplete={handleAssessmentComplete}
-            onBack={() => {
-              setStep('symptom')
-              setCurrentSymptomForAssessment(null)
-            }}
-          />
-        )}
-
-        {step === 'confirmation' && (
-          <SymptomConfirmation
-            symptoms={selectedSymptoms}
-            symptomAssessments={symptomAssessments}
-            onConfirm={handleConfirmSymptoms}
-          />
-        )}
-
-        {step === 'medication' && (
-          <MedicationRecommendation
-            symptoms={selectedSymptoms}
-            medications={recommendedMedications}
-            userAge={userAge}
-            onOrder={handleOrder}
-          />
-        )}
-
-        {step === 'payment' && selectedMedications.length > 0 && (
-          <Payment
-            medications={selectedMedications}
-            totalPrice={selectedMedications.reduce((sum, m) => sum + m.price, 0)}
-            onPay={handlePayment}
-            onBack={handleBack}
-          />
-        )}
+        {/* 所有用户都可以访问的功能 */}
 
         {step === 'consultation-patient' && user && currentConsultationSession && (
           <SimpleChat
             user={user}
-            onBack={() => setStep('age')}
+            onBack={() => setStep('welcome')}
             sessionId={currentConsultationSession.id}
             isDoctor={false}
-            otherUserInfo={currentConsultationSession.doctor || { name: 'Doctor' }}
+            otherUserInfo={currentConsultationSession.doctor || { name: 'Pharmacist' }}
+            session={currentConsultationSession}
+            onMedicationAccepted={handleMedicationAccepted}
+            onConsultationComplete={() => {
+              console.log('[App] onConsultationComplete callback called directly in JSX')
+              handleConsultationComplete()
+            }}
           />
         )}
 
         {step === 'consultation-doctor' && user && currentConsultationSession && (
           <SimpleChat
             user={user}
-            onBack={() => setStep('age')}
+            onBack={() => setStep('welcome')}
             sessionId={currentConsultationSession.id}
             isDoctor={true}
             otherUserInfo={{ email: 'Patient' }}
+            session={currentConsultationSession}
+          />
+        )}
+
+        {step === 'consultation-review' && user && currentConsultationSession && (
+          <ConsultationMedicationReview
+            sessionId={currentConsultationSession.id}
+            user={user}
+            onContinue={handleMedicationReviewContinue}
+            onBack={handleBack}
           />
         )}
 
@@ -785,17 +1014,50 @@ function App() {
           />
         )}
 
-        {step === 'profile' && user && (
+        {step === 'profile' && user && userRole !== 'admin' && (
           <Profile
             user={user}
             onLogout={handleLogout}
+            onRestartFlow={handleRestartFlow}
+            onTrackOrder={(orderId) => {
+              setTrackingOrderId(orderId)
+              setStep('order-tracking')
+            }}
           />
         )}
 
-        {step === 'admin' && user && (
-          <FarmasiAdmin
+        {step === 'order-tracking' && user && trackingOrderId && (
+          <OrderTracking
+            orderId={trackingOrderId}
             user={user}
-            onBack={handleBackFromAdmin}
+            onBack={() => {
+              setStep('profile')
+              setTrackingOrderId(null)
+            }}
+          />
+        )}
+
+        {showNotifications && user && (
+          <NotificationCenter
+            user={user}
+            onClose={() => setShowNotifications(false)}
+          />
+        )}
+
+        {step === 'consultation-waiting' && user && (
+          <ConsultationWaiting
+            user={user}
+            symptoms={selectedSymptoms}
+            symptomAssessments={symptomAssessments}
+            selectedBodyPart={selectedBodyPart}
+            userAge={userAge}
+            onMatched={(queue) => {
+              // 当匹配成功时，加载会话并跳转到聊天
+              loadMatchedSession(queue)
+            }}
+            onCancel={() => {
+              setStep('welcome')
+            }}
           />
         )}
       </main>

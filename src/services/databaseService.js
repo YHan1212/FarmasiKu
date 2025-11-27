@@ -40,18 +40,21 @@ export const databaseService = {
   // Save order with medications
   async saveOrder(orderData) {
     try {
-      const { medications, paymentMethod, transactionId, userAge, userId } = orderData
+      const { medications, paymentMethod, transactionId, userAge, userId, deliveryAddress, phoneNumber } = orderData
       
       const totalAmount = medications.reduce((sum, med) => sum + med.price, 0)
       
-      // Save order
+      // Save order with delivery info
       const order = await db.saveOrder({
         total_amount: totalAmount,
         payment_method: paymentMethod,
         transaction_id: transactionId,
         status: 'paid',
         age: userAge,
-        user_id: userId || null
+        user_id: userId || null,
+        delivery_address: deliveryAddress ? JSON.stringify(deliveryAddress) : null,
+        phone_number: phoneNumber || null,
+        delivery_status: 'pending' // 初始状态为待接单
       })
       
       // Only save order items and reduce stock if order was successfully created

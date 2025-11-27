@@ -13,6 +13,12 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToForgotPassword }) {
     setError(null)
     setLoading(true)
 
+    if (!supabase) {
+      setError('Database not configured. Please continue as guest or configure Supabase.')
+      setLoading(false)
+      return
+    }
+
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,

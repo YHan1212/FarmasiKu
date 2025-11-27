@@ -13,6 +13,12 @@ function ForgotPassword({ onBack, onSwitchToLogin }) {
     setError(null)
     setLoading(true)
 
+    if (!supabase) {
+      setError('Database not configured. Please configure Supabase to reset password.')
+      setLoading(false)
+      return
+    }
+
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}?type=recovery`

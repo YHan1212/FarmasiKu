@@ -22,7 +22,7 @@ function DangerWarning({ symptoms, onConsultation, onContinue }) {
       </p>
       <div className="warning-actions">
         <button className="consultation-button" onClick={onConsultation}>
-          Consult Doctor Now
+          Consult Pharmacist Now
         </button>
         <button className="continue-button" onClick={onContinue}>
           Continue Anyway

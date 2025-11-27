@@ -1,0 +1,177 @@
+.accept-order-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.accept-order-dialog {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.accept-order-dialog h3 {
+  color: #1E293B;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.order-info {
+  background: #F8FAFC;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.order-info p {
+  margin: 8px 0;
+  color: #1E293B;
+  font-size: 14px;
+}
+
+.delivery-address {
+  margin: 12px 0;
+  padding: 12px;
+  background: white;
+  border-radius: 6px;
+  border-left: 3px solid #3B82F6;
+}
+
+.delivery-address p {
+  margin: 4px 0;
+  color: #64748B;
+}
+
+.time-selection {
+  margin-bottom: 24px;
+}
+
+.time-selection > label {
+  display: block;
+  color: #1E293B;
+  font-weight: 500;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.time-inputs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.time-input-group {
+  flex: 1;
+}
+
+.time-input-group label {
+  display: block;
+  color: #64748B;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.time-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 16px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.time-select:focus {
+  outline: none;
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.time-separator {
+  font-size: 24px;
+  color: #1E293B;
+  font-weight: 600;
+  margin-top: 24px;
+}
+
+.estimated-time {
+  color: #3B82F6;
+  font-weight: 600;
+  font-size: 16px;
+  text-align: center;
+  padding: 12px;
+  background: #EFF6FF;
+  border-radius: 8px;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.cancel-btn,
+.accept-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.cancel-btn {
+  background: white;
+  color: #64748B;
+  border: 2px solid #E5E7EB;
+}
+
+.cancel-btn:hover {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+}
+
+.accept-btn {
+  background: #3B82F6;
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.accept-btn:hover {
+  background: #2563EB;
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+/* 移动端响应式 */
+@media (max-width: 768px) {
+  .accept-order-dialog {
+    padding: 20px;
+    margin: 10px;
+  }
+
+  .time-inputs {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .time-separator {
+    margin: 0;
+  }
+}
+

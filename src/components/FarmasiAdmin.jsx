@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { databaseService } from '../services/databaseService'
+import AcceptOrderDialog from './AcceptOrderDialog'
+import PharmacistDashboard from './PharmacistDashboard'
 import './FarmasiAdmin.css'
 
-function FarmasiAdmin({ user, onBack }) {
-  const [activeTab, setActiveTab] = useState('dashboard') // 'dashboard', 'orders', 'users', 'consultations', 'medications', 'doctors'
+function FarmasiAdmin({ user, onBack, onLogout }) {
+  const [activeTab, setActiveTab] = useState('dashboard') // 'dashboard', 'orders', 'users', 'consultations', 'medications', 'doctors', 'pharmacist'
   const [loading, setLoading] = useState(true)
   
   // Dashboard stats
@@ -44,6 +46,9 @@ function FarmasiAdmin({ user, onBack }) {
     is_available: true
   })
 
+  // Order management
+  const [acceptingOrder, setAcceptingOrder] = useState(null) // Order being accepted
+
   useEffect(() => {
     loadDashboardData()
   }, [])
@@ -61,6 +66,40 @@ function FarmasiAdmin({ user, onBack }) {
       loadDoctors()
     }
   }, [activeTab, orderFilter])
+
+  // Set up realtime subscription for orders
+  useEffect(() => {
+    if (!supabase) return
+
+    // Subscribe to orders table changes
+    const ordersChannel = supabase
+      .channel('orders_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'orders'
+        },
+        (payload) => {
+          console.log('Order change detected:', payload)
+          // Reload orders if we're on the orders tab
+          if (activeTab === 'orders') {
+            loadOrders()
+          }
+          // Also reload dashboard data to update stats
+          if (activeTab === 'dashboard') {
+            loadDashboardData()
+          }
+        }
+      )
+      .subscribe()
+
+    // Cleanup subscription on unmount
+    return () => {
+      supabase.removeChannel(ordersChannel)
+    }
+  }, [activeTab, supabase])
 
   const loadDashboardData = async () => {
     try {
@@ -110,6 +149,8 @@ function FarmasiAdmin({ user, onBack }) {
           order_items (*)
         `)
         .order('created_at', { ascending: false })
+      
+      console.log('Loading orders for admin...')
 
       // Apply date filter
       if (orderFilter === 'today') {
@@ -127,8 +168,21 @@ function FarmasiAdmin({ user, onBack }) {
       }
 
       const { data, error } = await query
-      if (error) throw error
-      setOrders(data || [])
+      if (error) {
+        console.error('Error loading orders:', error)
+        throw error
+      }
+      
+      // Parse delivery_address if it's a string
+      const parsedOrders = (data || []).map(order => ({
+        ...order,
+        delivery_address: typeof order.delivery_address === 'string' 
+          ? (order.delivery_address ? JSON.parse(order.delivery_address) : null)
+          : order.delivery_address
+      }))
+      
+      console.log('Orders loaded:', parsedOrders.length, 'orders')
+      setOrders(parsedOrders)
     } catch (error) {
       console.error('Error loading orders:', error)
       setOrders([])
@@ -362,7 +416,7 @@ function FarmasiAdmin({ user, onBack }) {
   const handleAddDoctor = async () => {
     try {
       if (!doctorForm.name.trim()) {
-        alert('Please enter doctor name')
+        alert('Please enter pharmacist name')
         return
       }
 
@@ -380,10 +434,10 @@ function FarmasiAdmin({ user, onBack }) {
       setShowAddDoctor(false)
       setDoctorForm({ name: '', specialization: '', bio: '', is_available: true })
       await loadDoctors()
-      alert('Doctor added successfully!')
+      alert('Pharmacist added successfully!')
     } catch (error) {
       console.error('Error adding doctor:', error)
-      alert(`Failed to add doctor: ${error.message || 'Unknown error'}`)
+      alert(`Failed to add pharmacist: ${error.message || 'Unknown error'}`)
     }
   }
 
@@ -400,7 +454,7 @@ function FarmasiAdmin({ user, onBack }) {
   const handleSaveDoctor = async (doctorId) => {
     try {
       if (!doctorForm.name.trim()) {
-        alert('Please enter doctor name')
+        alert('Please enter pharmacist name')
         return
       }
 
@@ -420,15 +474,15 @@ function FarmasiAdmin({ user, onBack }) {
       setEditingDoctor(null)
       setDoctorForm({ name: '', specialization: '', bio: '', is_available: true })
       await loadDoctors()
-      alert('Doctor updated successfully!')
+      alert('Pharmacist updated successfully!')
     } catch (error) {
       console.error('Error updating doctor:', error)
-      alert(`Failed to update doctor: ${error.message || 'Unknown error'}`)
+      alert(`Failed to update pharmacist: ${error.message || 'Unknown error'}`)
     }
   }
 
   const handleDeleteDoctor = async (doctorId) => {
-    if (!confirm('Are you sure you want to delete this doctor? This action cannot be undone.')) {
+    if (!confirm('Are you sure you want to delete this pharmacist? This action cannot be undone.')) {
       return
     }
 
@@ -441,10 +495,10 @@ function FarmasiAdmin({ user, onBack }) {
       if (error) throw error
 
       await loadDoctors()
-      alert('Doctor deleted successfully!')
+      alert('Pharmacist deleted successfully!')
     } catch (error) {
       console.error('Error deleting doctor:', error)
-      alert(`Failed to delete doctor: ${error.message || 'Unknown error'}`)
+      alert(`Failed to delete pharmacist: ${error.message || 'Unknown error'}`)
     }
   }
 
@@ -463,7 +517,7 @@ function FarmasiAdmin({ user, onBack }) {
       await loadDoctors()
     } catch (error) {
       console.error('Error toggling doctor availability:', error)
-      alert('Failed to update doctor availability')
+      alert('Failed to update pharmacist availability')
     }
   }
 
@@ -473,7 +527,7 @@ function FarmasiAdmin({ user, onBack }) {
       return
     }
 
-    if (!confirm('Link this doctor account to your current user account? You will be able to reply to consultations as this doctor.')) {
+    if (!confirm('Link this pharmacist account to your current user account? You will be able to reply to consultations as this pharmacist.')) {
       return
     }
 
@@ -486,7 +540,7 @@ function FarmasiAdmin({ user, onBack }) {
         .single()
 
       if (existingDoctor && existingDoctor.id !== doctorId) {
-        if (!confirm(`Another doctor (${existingDoctor.name}) is already linked to your account. Replace it with this doctor?`)) {
+        if (!confirm(`Another pharmacist (${existingDoctor.name}) is already linked to your account. Replace it with this pharmacist?`)) {
           return
         }
       }
@@ -502,10 +556,115 @@ function FarmasiAdmin({ user, onBack }) {
       if (error) throw error
 
       await loadDoctors()
-      alert('Doctor account linked successfully! You can now reply to consultations as this doctor.')
+      alert('Pharmacist account linked successfully! You can now reply to consultations as this pharmacist.')
     } catch (error) {
       console.error('Error linking doctor to user:', error)
-      alert(`Failed to link doctor: ${error.message || 'Unknown error'}`)
+      alert(`Failed to link pharmacist: ${error.message || 'Unknown error'}`)
+    }
+  }
+
+  const handleUnlinkDoctorFromUser = async (doctorId) => {
+    if (!confirm('Are you sure you want to unlink this pharmacist account from your user account? You will no longer be able to reply to consultations as this pharmacist.')) {
+      return
+    }
+
+    try {
+      const { error } = await supabase
+        .from('doctors')
+        .update({
+          user_id: null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', doctorId)
+
+      if (error) throw error
+
+      await loadDoctors()
+      alert('Pharmacist account unlinked successfully!')
+    } catch (error) {
+      console.error('Error unlinking doctor from user:', error)
+      alert(`Failed to unlink pharmacist: ${error.message || 'Unknown error'}`)
+    }
+  }
+
+  const handleToggleUserRole = async (userId, currentRole) => {
+    if (!confirm(`Are you sure you want to ${currentRole === 'admin' ? 'remove admin privileges from' : 'make'} this user?`)) {
+      return
+    }
+
+    try {
+      const newRole = currentRole === 'admin' ? 'user' : 'admin'
+      
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ role: newRole })
+        .eq('id', userId)
+
+      if (error) throw error
+
+      // Reload users to reflect the change
+      await loadUsers()
+      alert(`User role updated to ${newRole} successfully!`)
+    } catch (error) {
+      console.error('Error updating user role:', error)
+      alert(`Failed to update user role: ${error.message || 'Unknown error'}`)
+    }
+  }
+
+  const handleAcceptOrder = async (orderId, data) => {
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({
+          delivery_status: 'accepted',
+          estimated_delivery_time: data.estimatedDeliveryTime,
+          accepted_at: new Date().toISOString()
+        })
+        .eq('id', orderId)
+
+      if (error) throw error
+
+      // Close dialog
+      setAcceptingOrder(null)
+      
+      // Reload orders
+      await loadOrders()
+      
+      alert('Order accepted successfully!')
+    } catch (error) {
+      console.error('Error accepting order:', error)
+      alert(`Failed to accept order: ${error.message || 'Unknown error'}`)
+    }
+  }
+
+  const handleUpdateOrderStatus = async (orderId, status) => {
+    try {
+      const updateData = {
+        delivery_status: status,
+        updated_at: new Date().toISOString()
+      }
+
+      // Add timestamp based on status
+      if (status === 'preparing') {
+        updateData.preparing_at = new Date().toISOString()
+      } else if (status === 'out_for_delivery') {
+        updateData.out_for_delivery_at = new Date().toISOString()
+      }
+
+      const { error } = await supabase
+        .from('orders')
+        .update(updateData)
+        .eq('id', orderId)
+
+      if (error) throw error
+
+      // Reload orders
+      await loadOrders()
+      
+      alert(`Order status updated to ${status} successfully!`)
+    } catch (error) {
+      console.error('Error updating order status:', error)
+      alert(`Failed to update order status: ${error.message || 'Unknown error'}`)
     }
   }
 
@@ -551,9 +710,32 @@ function FarmasiAdmin({ user, onBack }) {
             <h1>🏥 farmasiKu Admin</h1>
             <p>Management Dashboard</p>
           </div>
-          <button className="back-button" onClick={onBack}>
-            ← Back to App
-          </button>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            {onBack && (
+              <button className="back-button" onClick={onBack}>
+                ← Back to App
+              </button>
+            )}
+            {onLogout && (
+              <button 
+                className="logout-button-header" 
+                onClick={onLogout}
+                style={{
+                  background: '#EF4444',
+                  color: 'white',
+                  border: 'none',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.3s'
+                }}
+              >
+                🚪 Logout
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -592,7 +774,13 @@ function FarmasiAdmin({ user, onBack }) {
           className={`tab ${activeTab === 'doctors' ? 'active' : ''}`}
           onClick={() => setActiveTab('doctors')}
         >
-          👨‍⚕️ Doctors ({doctors.length})
+          👨‍⚕️ Pharmacists ({doctors.length})
+        </button>
+        <button
+          className={`tab ${activeTab === 'pharmacist' ? 'active' : ''}`}
+          onClick={() => setActiveTab('pharmacist')}
+        >
+          💬 Pharmacist Dashboard
         </button>
       </div>
 
@@ -667,7 +855,7 @@ function FarmasiAdmin({ user, onBack }) {
 
         {activeTab === 'orders' && (
           <div className="orders-section">
-            <div className="section-header">
+            <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <div className="filters">
                 <select 
                   value={orderFilter} 
@@ -687,6 +875,24 @@ function FarmasiAdmin({ user, onBack }) {
                   className="search-input"
                 />
               </div>
+              <button
+                onClick={loadOrders}
+                style={{
+                  background: '#3B82F6',
+                  color: 'white',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.3s'
+                }}
+                onMouseOver={(e) => e.target.style.background = '#2563EB'}
+                onMouseOut={(e) => e.target.style.background = '#3B82F6'}
+              >
+                🔄 Refresh
+              </button>
             </div>
 
             {loading ? (
@@ -704,12 +910,39 @@ function FarmasiAdmin({ user, onBack }) {
                           <p className="order-date">{formatDate(order.created_at)}</p>
                         </div>
                         <div className="order-meta">
-                          <span className={`status-badge status-${order.status || 'completed'}`}>
-                            {order.status || 'completed'}
+                          <span className={`status-badge status-${order.delivery_status || order.status || 'pending'}`}>
+                            {order.delivery_status || order.status || 'pending'}
                           </span>
                           <span className="order-total">{formatCurrency(order.total_amount)}</span>
                         </div>
                       </div>
+
+                      {/* Delivery Information */}
+                      {(order.delivery_address || order.phone_number) && (
+                        <div className="delivery-info-section">
+                          {order.delivery_address && (
+                            <div className="delivery-address-info">
+                              <strong>📍 Delivery Address:</strong>
+                              <p>{order.delivery_address.address_line1}</p>
+                              {order.delivery_address.address_line2 && <p>{order.delivery_address.address_line2}</p>}
+                              {order.delivery_address.postal_code && <p>{order.delivery_address.postal_code}</p>}
+                              {order.delivery_address.city && order.delivery_address.state && (
+                                <p>{order.delivery_address.city}, {order.delivery_address.state}</p>
+                              )}
+                            </div>
+                          )}
+                          {order.phone_number && (
+                            <div className="delivery-phone-info">
+                              <strong>📞 Phone:</strong> {order.phone_number}
+                            </div>
+                          )}
+                          {order.estimated_delivery_time && (
+                            <div className="estimated-delivery-info">
+                              <strong>⏰ Estimated Delivery:</strong> {formatDate(order.estimated_delivery_time)}
+                            </div>
+                          )}
+                        </div>
+                      )}
                       
                       <div className="order-items-admin">
                         {order.order_items?.map((item, index) => (
@@ -724,6 +957,54 @@ function FarmasiAdmin({ user, onBack }) {
                         <span>Payment: {order.payment_method || 'N/A'}</span>
                         {order.user_id && (
                           <span>User ID: {order.user_id.substring(0, 8)}...</span>
+                        )}
+                      </div>
+
+                      {/* 订单操作按钮 */}
+                      <div className="order-actions">
+                        {(!order.delivery_status || order.delivery_status === 'pending') && (
+                          <button
+                            className="accept-order-btn"
+                            onClick={() => setAcceptingOrder(order)}
+                          >
+                            ✅ Accept Order
+                          </button>
+                        )}
+                        {order.delivery_status === 'accepted' && (
+                          <button
+                            className="prepare-order-btn"
+                            onClick={() => handleUpdateOrderStatus(order.id, 'preparing')}
+                          >
+                            📦 Mark Preparing
+                          </button>
+                        )}
+                        {order.delivery_status === 'preparing' && (
+                          <button
+                            className="deliver-order-btn"
+                            onClick={() => handleUpdateOrderStatus(order.id, 'out_for_delivery')}
+                          >
+                            🚚 Out for Delivery
+                          </button>
+                        )}
+                        {order.delivery_status === 'out_for_delivery' && (
+                          <div className="delivery-status-info">
+                            <span className="delivery-status-text">🚚 Out for Delivery</span>
+                            {order.estimated_delivery_time && (
+                              <span className="delivery-time-text">
+                                Estimated: {formatDate(order.estimated_delivery_time)}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                        {order.delivery_status === 'delivered' && (
+                          <div className="delivered-status">
+                            ✅ 已送达
+                            {order.actual_delivery_time && (
+                              <span className="delivered-time">
+                                {formatDate(order.actual_delivery_time)}
+                              </span>
+                            )}
+                          </div>
                         )}
                       </div>
                     </div>
@@ -748,12 +1029,27 @@ function FarmasiAdmin({ user, onBack }) {
                       <div className="user-info">
                         <h3>{user.email || 'N/A'}</h3>
                         <p>Age: {user.age || 'Not set'}</p>
+                        <p>
+                          <strong>Role:</strong>{' '}
+                          <span className={`role-badge role-${user.role || 'user'}`}>
+                            {user.role === 'admin' ? '👑 Admin' : '👤 User'}
+                          </span>
+                        </p>
                         <p className="user-date">
                           Joined: {formatDate(user.created_at)}
                         </p>
                       </div>
-                      <div className="user-id">
-                        ID: {user.id.substring(0, 8)}...
+                      <div className="user-actions">
+                        <button
+                          className={`role-toggle-btn ${user.role === 'admin' ? 'admin-active' : ''}`}
+                          onClick={() => handleToggleUserRole(user.id, user.role)}
+                          disabled={loading}
+                        >
+                          {user.role === 'admin' ? 'Remove Admin' : 'Make Admin'}
+                        </button>
+                        <div className="user-id">
+                          ID: {user.id.substring(0, 8)}...
+                        </div>
                       </div>
                     </div>
                   ))
@@ -791,6 +1087,13 @@ function FarmasiAdmin({ user, onBack }) {
               </div>
             )}
           </div>
+        )}
+
+        {activeTab === 'pharmacist' && (
+          <PharmacistDashboard
+            user={user}
+            onBack={() => setActiveTab('dashboard')}
+          />
         )}
 
         {activeTab === 'medications' && (
@@ -930,13 +1233,13 @@ function FarmasiAdmin({ user, onBack }) {
                   setDoctorForm({ name: '', specialization: '', bio: '', is_available: true })
                 }}
               >
-                + Add Doctor
+                + Add Pharmacist
               </button>
             </div>
 
             {showAddDoctor && (
               <div className="doctor-form-card">
-                <h3>Add New Doctor</h3>
+                <h3>Add New Pharmacist</h3>
                 <div className="form-group">
                   <label>Name *</label>
                   <input
@@ -962,7 +1265,7 @@ function FarmasiAdmin({ user, onBack }) {
                   <textarea
                     value={doctorForm.bio}
                     onChange={(e) => setDoctorForm({ ...doctorForm, bio: e.target.value })}
-                    placeholder="Doctor's bio and qualifications..."
+                    placeholder="Pharmacist's bio and qualifications..."
                     className="form-textarea"
                     rows="3"
                   />
@@ -979,7 +1282,7 @@ function FarmasiAdmin({ user, onBack }) {
                 </div>
                 <div className="form-actions">
                   <button className="save-btn" onClick={handleAddDoctor}>
-                    Add Doctor
+                    Add Pharmacist
                   </button>
                   <button className="cancel-btn" onClick={() => setShowAddDoctor(false)}>
                     Cancel
@@ -993,7 +1296,7 @@ function FarmasiAdmin({ user, onBack }) {
             ) : (
               <div className="doctors-list">
                 {doctors.length === 0 ? (
-                  <div className="empty-state">No doctors found. Add your first doctor!</div>
+                  <div className="empty-state">No pharmacists found. Add your first pharmacist!</div>
                 ) : (
                   doctors.map((doctor) => (
                     <div key={doctor.id} className={`doctor-card ${!doctor.is_available ? 'unavailable' : ''}`}>
@@ -1078,15 +1381,23 @@ function FarmasiAdmin({ user, onBack }) {
                               )}
                             </div>
                             <div className="doctor-actions">
-                              {!doctor.user_id && user?.id && (
+                              {doctor.user_id === user?.id ? (
+                                <button
+                                  className="unlink-user-btn"
+                                  onClick={() => handleUnlinkDoctorFromUser(doctor.id)}
+                                  title="Unlink this pharmacist from your account"
+                                >
+                                  🔓 Unlink from My Account
+                                </button>
+                              ) : !doctor.user_id && user?.id ? (
                                 <button
                                   className="link-user-btn"
                                   onClick={() => handleLinkDoctorToUser(doctor.id)}
-                                  title="Link this doctor to your current account so you can reply to consultations"
+                                  title="Link this pharmacist to your current account so you can reply to consultations"
                                 >
                                   🔗 Link to My Account
                                 </button>
-                              )}
+                              ) : null}
                               <button
                                 className="toggle-availability-btn"
                                 onClick={() => handleToggleDoctorAvailability(doctor.id, doctor.is_available)}
@@ -1117,6 +1428,15 @@ function FarmasiAdmin({ user, onBack }) {
           </div>
         )}
       </div>
+
+      {/* Accept Order Dialog */}
+      {acceptingOrder && (
+        <AcceptOrderDialog
+          order={acceptingOrder}
+          onAccept={(data) => handleAcceptOrder(acceptingOrder.id, data)}
+          onCancel={() => setAcceptingOrder(null)}
+        />
+      )}
     </div>
   )
 }

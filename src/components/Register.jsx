@@ -25,6 +25,12 @@ function Register({ onRegister, onSwitchToLogin }) {
       return
     }
 
+    if (!supabase) {
+      setError('Database not configured. Please configure Supabase to register.')
+      setLoading(false)
+      return
+    }
+
     setLoading(true)
 
     try {

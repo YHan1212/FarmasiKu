@@ -11,6 +11,11 @@ function ResetPassword({ onBack }) {
 
   useEffect(() => {
     // Check if we have a valid session for password reset
+    if (!supabase) {
+      setError('Database not configured.')
+      return
+    }
+    
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) {
         setError('Invalid or expired reset link. Please request a new one.')
@@ -29,6 +34,12 @@ function ResetPassword({ onBack }) {
 
     if (password.length < 6) {
       setError('Password must be at least 6 characters')
+      return
+    }
+
+    if (!supabase) {
+      setError('Database not configured. Please configure Supabase to reset password.')
+      setLoading(false)
       return
     }
 

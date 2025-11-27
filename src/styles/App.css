@@ -89,6 +89,23 @@
   background: #2563EB;
 }
 
+.notification-button {
+  background: transparent;
+  color: #3B82F6;
+  border: 2px solid #3B82F6;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.notification-button:hover {
+  background: #EFF6FF;
+  transform: translateY(-2px);
+}
+
 .profile-button {
   background: #3B82F6;
   color: white;
@@ -109,6 +126,24 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
   background: #2563EB;
+}
+
+.logout-button-header {
+  background: #EF4444;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.logout-button-header:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  background: #DC2626;
 }
 
 .app-main {
