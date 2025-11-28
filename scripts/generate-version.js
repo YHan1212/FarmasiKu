@@ -67,7 +67,18 @@ try {
   const outputPath = resolve(process.cwd(), 'src/version.json')
   writeFileSync(outputPath, JSON.stringify(versionInfo, null, 2), 'utf-8')
   
-  console.log('✅ Version info generated:', versionInfo)
+  // 使用更明显的输出格式，确保在 Vercel 构建日志中可见
+  console.log('')
+  console.log('='.repeat(60))
+  console.log('✅ VERSION INFO GENERATED SUCCESSFULLY')
+  console.log('='.repeat(60))
+  console.log('Commit Hash:', versionInfo.commitHash)
+  console.log('Commit Date:', versionInfo.commitDate)
+  console.log('Build Time:', versionInfo.buildTime)
+  console.log('Branch:', versionInfo.branch)
+  console.log('File written to:', outputPath)
+  console.log('='.repeat(60))
+  console.log('')
 } catch (error) {
   console.error('❌ Error generating version info:', error.message)
   // 如果 Git 命令失败，创建默认版本信息
@@ -100,6 +111,13 @@ try {
   
   const outputPath = resolve(process.cwd(), 'src/version.json')
   writeFileSync(outputPath, JSON.stringify(defaultVersion, null, 2), 'utf-8')
-  console.log('⚠️ Using default version info')
+  console.log('')
+  console.log('='.repeat(60))
+  console.log('⚠️ USING DEFAULT VERSION INFO (Git commands failed)')
+  console.log('='.repeat(60))
+  console.log('Error:', error.message)
+  console.log('File written to:', outputPath)
+  console.log('='.repeat(60))
+  console.log('')
 }
 
