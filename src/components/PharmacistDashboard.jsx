@@ -190,6 +190,7 @@ function PharmacistDashboard({ user, onBack }) {
       // - Admin 用户可以看到所有 waiting 队列
       // - 普通用户只能看到自己的队列
       // - 链接了 pharmacist account 的用户也可以看到 waiting 队列
+      // 更新时间：2025-11-28 - 修复 Admin 查看 waiting 队列
       console.log('[PharmacistDashboard] Loading waiting queues...')
       const { data: queues, error: queueError } = await supabase
         .from('consultation_queue')
