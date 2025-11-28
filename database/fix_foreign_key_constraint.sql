@@ -32,4 +32,3 @@ ADD CONSTRAINT pharmacist_availability_pharmacist_id_fkey
 FOREIGN KEY (pharmacist_id)
 REFERENCES public.doctors(id)
 ON DELETE CASCADE;
-
