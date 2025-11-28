@@ -2,6 +2,14 @@ import React, { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import './Login.css'
 
+// 导入版本信息
+import versionInfoRaw from '../version.json'
+
+const versionInfo = versionInfoRaw || {
+  commitDate: '未知',
+  buildTime: '未知'
+}
+
 function Login({ onLogin, onSwitchToRegister, onSwitchToForgotPassword }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -135,6 +143,18 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToForgotPassword }) {
         >
           Continue as Guest
         </button>
+      </div>
+      
+      {/* 版本信息 - 显示在右下角 */}
+      <div className="version-info">
+        <div className="version-text">
+          部署时间: {versionInfo?.buildTime || versionInfo?.commitDate || '未知'}
+        </div>
+        {versionInfo?.commitHash && (
+          <div className="version-hash">
+            {versionInfo.commitHash}
+          </div>
+        )}
       </div>
     </div>
   )

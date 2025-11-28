@@ -201,3 +201,44 @@
   }
 }
 
+/* 版本信息样式 - 右下角 */
+.version-info {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 11px;
+  color: #666;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  text-align: right;
+  backdrop-filter: blur(4px);
+}
+
+.version-text {
+  margin-bottom: 2px;
+  font-weight: 500;
+}
+
+.version-hash {
+  font-size: 10px;
+  color: #999;
+  font-family: 'Courier New', monospace;
+}
+
+@media (max-width: 480px) {
+  .version-info {
+    bottom: 12px;
+    right: 12px;
+    padding: 6px 10px;
+    font-size: 10px;
+  }
+  
+  .version-hash {
+    font-size: 9px;
+  }
+}
+

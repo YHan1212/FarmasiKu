@@ -175,8 +175,6 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
 
   const matchPharmacist = async (queueId) => {
     try {
-      console.log('[ConsultationWaiting] Starting pharmacist matching for queue:', queueId)
-      
       // 查找在线且不忙碌的药剂师
       const { data: availablePharmacists, error } = await supabase
         .from('pharmacist_availability')
@@ -189,21 +187,14 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
         .order('current_sessions_count', { ascending: true })
         .limit(1)
 
-      if (error) {
-        console.error('[ConsultationWaiting] Error querying pharmacists:', error)
-        throw error
-      }
-
-      console.log('[ConsultationWaiting] Available pharmacists found:', availablePharmacists?.length || 0)
+      if (error) throw error
 
       if (!availablePharmacists || availablePharmacists.length === 0) {
         // 没有可用药剂师，继续等待
-        console.log('[ConsultationWaiting] No available pharmacists, continuing to wait')
         return
       }
 
       const pharmacist = availablePharmacists[0]
-      console.log('[ConsultationWaiting] Selected pharmacist:', pharmacist.pharmacist_id)
 
       // 更新队列状态
       const { error: updateError } = await supabase
@@ -215,12 +206,7 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
         })
         .eq('id', queueId)
 
-      if (updateError) {
-        console.error('[ConsultationWaiting] Error updating queue:', updateError)
-        throw updateError
-      }
-
-      console.log('[ConsultationWaiting] Queue updated to matched status')
+      if (updateError) throw updateError
 
       // 创建咨询会话
       const { data: session, error: sessionError } = await supabase
@@ -236,43 +222,25 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
         .select()
         .single()
 
-      if (sessionError) {
-        console.error('[ConsultationWaiting] Error creating session:', sessionError)
-        throw sessionError
-      }
-
-      console.log('[ConsultationWaiting] Session created:', session.id)
+      if (sessionError) throw sessionError
 
       // 更新药剂师状态
-      const { error: availabilityError } = await supabase
+      await supabase
         .from('pharmacist_availability')
         .update({
           is_busy: true,
           current_session_id: session.id,
-          current_sessions_count: (pharmacist.current_sessions_count || 0) + 1
+          current_sessions_count: pharmacist.current_sessions_count + 1
         })
         .eq('id', pharmacist.id)
 
-      if (availabilityError) {
-        console.error('[ConsultationWaiting] Error updating pharmacist availability:', availabilityError)
-        // 不抛出错误，因为会话已创建
-      }
-
-      console.log('[ConsultationWaiting] Pharmacist matched successfully, calling onMatched')
-      
       // 通知匹配成功
       if (onMatched) {
         onMatched({ ...queue, matched_pharmacist_id: pharmacist.pharmacist_id })
       }
     } catch (error) {
-      console.error('[ConsultationWaiting] Error matching pharmacist:', error)
-      console.error('[ConsultationWaiting] Error details:', {
-        message: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint
-      })
-      // 匹配失败，继续等待（不显示错误给用户，因为会自动重试）
+      console.error('Error matching pharmacist:', error)
+      // 匹配失败，继续等待
     }
   }
 
