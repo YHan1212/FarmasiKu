@@ -56,13 +56,13 @@ export const consultationService = {
 
       if (queueError) throw queueError
 
-      // 更新队列状态为 'accepted'（匹配成功）
+      // 更新队列状态
       const { error: updateError } = await supabase
         .from('consultation_queue')
         .update({
-          status: 'accepted',
-          pharmacist_id: pharmacist.pharmacist_id,
-          accepted_at: new Date().toISOString()
+          status: 'matched',
+          matched_pharmacist_id: pharmacist.pharmacist_id,
+          matched_at: new Date().toISOString()
         })
         .eq('id', queueId)
 
@@ -83,14 +83,6 @@ export const consultationService = {
         .single()
 
       if (sessionError) throw sessionError
-
-      // 更新队列状态为 'in_chat'（会话已创建，正在聊天）
-      await supabase
-        .from('consultation_queue')
-        .update({
-          status: 'in_chat'
-        })
-        .eq('id', queueId)
 
       // 更新药剂师状态
       await supabase

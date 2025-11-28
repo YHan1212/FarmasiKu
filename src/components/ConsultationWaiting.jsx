@@ -10,87 +10,118 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
   const [estimatedWait, setEstimatedWait] = useState(null)
   const [onlinePharmacists, setOnlinePharmacists] = useState(0)
 
-  // 初始化：检查现有队列或创建新队列
   useEffect(() => {
     if (!user) return
 
-    console.log('[ConsultationWaiting] Component mounted, user:', user.id)
-    initializeQueue()
+    // 先加载在线药剂师数量
+    loadOnlinePharmacistsCount()
+
+    // 创建队列记录
+    createQueue()
+
+    // 检查是否已有队列
+    checkExistingQueue()
   }, [user])
 
-  // 初始化队列逻辑
-  const initializeQueue = async () => {
+  // 加载在线药剂师数量
+  const loadOnlinePharmacistsCount = async () => {
     try {
-      setLoading(true)
+      // 先尝试使用 count 查询
+      const { count, error: countError } = await supabase
+        .from('pharmacist_availability')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_online', true)
+        .eq('is_busy', false)
 
-      // 步骤 1: 检查是否有已匹配且有活跃会话的队列（可以进入聊天）
-      const { data: activeQueue } = await supabase
-        .from('consultation_queue')
-        .select('*')
-        .eq('patient_id', user.id)
-        .in('status', ['matched', 'in_consultation'])
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle()
-
-      if (activeQueue) {
-        // 检查是否有对应的活跃会话，且必须通过 queue_id 匹配
-        const { data: session } = await supabase
-          .from('consultation_sessions')
-          .select('id, status, queue_id')
-          .eq('queue_id', activeQueue.id)
-          .eq('status', 'active')
-          .maybeSingle()
-
-        if (session && session.status === 'active' && session.queue_id === activeQueue.id) {
-          // 有活跃会话且 queue_id 匹配，直接进入聊天
-          console.log('[ConsultationWaiting] Found active session with matching queue_id, entering chat')
-          if (onMatched) {
-            onMatched(activeQueue)
-          }
-          return
-        } else {
-          // 队列已匹配但没有活跃会话，取消它（可能是旧数据或测试数据）
-          console.log('[ConsultationWaiting] Active queue without active session, cancelling')
-          await supabase
-            .from('consultation_queue')
-            .update({ status: 'cancelled' })
-            .eq('id', activeQueue.id)
-        }
-      }
-
-      // 步骤 2: 检查是否有等待中的队列
-      const { data: waitingQueue } = await supabase
-        .from('consultation_queue')
-        .select('*')
-        .eq('patient_id', user.id)
-        .eq('status', 'waiting')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle()
-
-      if (waitingQueue) {
-        // 使用现有等待队列
-        console.log('[ConsultationWaiting] Found waiting queue:', waitingQueue.id)
-        setQueue(waitingQueue)
-        setLoading(false)
-        loadOnlinePharmacistsCount()
+      if (!countError && count !== null) {
+        console.log('Online pharmacists count:', count)
+        setOnlinePharmacists(count)
         return
       }
 
-      // 步骤 3: 创建新队列
-      console.log('[ConsultationWaiting] No existing queue, creating new queue')
-      await createQueue()
+      // 如果 count 查询失败，使用普通查询
+      console.log('Count query failed, trying alternative query...', countError)
+      const { data: pharmacists, error: altError } = await supabase
+        .from('pharmacist_availability')
+        .select('id')
+        .eq('is_online', true)
+        .eq('is_busy', false)
+      
+      if (!altError && pharmacists) {
+        console.log('Online pharmacists (alternative):', pharmacists.length)
+        setOnlinePharmacists(pharmacists.length)
+      } else {
+        console.error('Error loading online pharmacists:', altError)
+        setOnlinePharmacists(0)
+      }
     } catch (error) {
-      console.error('[ConsultationWaiting] Error initializing queue:', error)
-      alert(`Failed to initialize queue: ${error.message}`)
-      setLoading(false)
+      console.error('Error loading online pharmacists count:', error)
+      setOnlinePharmacists(0)
     }
   }
 
-  // 创建新队列
+  useEffect(() => {
+    if (!queue?.id) return
+
+    // 订阅队列状态变化
+    const channel = supabase
+      .channel(`queue:${queue.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'consultation_queue',
+          filter: `id=eq.${queue.id}`
+        },
+        (payload) => {
+          const updatedQueue = payload.new
+          setQueue(updatedQueue)
+          
+          if (updatedQueue.status === 'matched') {
+            // 匹配成功，通知父组件
+            if (onMatched) {
+              onMatched(updatedQueue)
+            }
+          }
+        }
+      )
+      .subscribe()
+
+    // 加载队列位置和等待时间
+    loadQueueInfo()
+
+    // 定期更新队列信息
+    const interval = setInterval(() => {
+      loadQueueInfo()
+      loadOnlinePharmacistsCount() // 同时更新在线药剂师数量
+    }, 5000) // 每5秒更新一次
+
+    return () => {
+      channel.unsubscribe()
+      clearInterval(interval)
+    }
+  }, [queue?.id])
+
   const createQueue = async () => {
     try {
+      // 检查是否已有等待中的队列
+      const { data: existingQueue } = await supabase
+        .from('consultation_queue')
+        .select('*')
+        .eq('patient_id', user.id)
+        .in('status', ['waiting', 'matched'])
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
+
+      if (existingQueue) {
+        setQueue(existingQueue)
+        setLoading(false)
+        return
+      }
+
+      // 创建新队列，包含症状信息
       const notes = JSON.stringify({
         symptomAssessments: symptomAssessments || {},
         selectedBodyPart: selectedBodyPart || null,
@@ -103,9 +134,10 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
         notes
       )
 
-      console.log('[ConsultationWaiting] Queue created:', data.id, 'status:', data.status)
       setQueue(data)
-      loadOnlinePharmacistsCount()
+      
+      // 尝试匹配药剂师
+      await matchPharmacist(data.id)
     } catch (error) {
       console.error('Error creating queue:', error)
       alert(`Failed to join queue: ${error.message}`)
@@ -114,145 +146,109 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
     }
   }
 
-  // 订阅队列状态变化和会话创建
-  useEffect(() => {
-    if (!queue?.id) return
-
-    console.log('[ConsultationWaiting] Setting up subscriptions for queue:', queue.id)
-
-    // 订阅队列状态变化
-    const queueChannel = supabase
-      .channel(`queue:${queue.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'consultation_queue',
-          filter: `id=eq.${queue.id}`
-        },
-        async (payload) => {
-          const updatedQueue = payload.new
-          console.log('[ConsultationWaiting] Queue updated:', updatedQueue.status)
-          setQueue(updatedQueue)
-          
-          // 只有当队列状态变为 'matched' 或 'in_consultation' 时，检查是否有活跃会话
-          if (updatedQueue.status === 'matched' || updatedQueue.status === 'in_consultation') {
-            await checkAndEnterChat(updatedQueue)
-          }
-        }
-      )
-      .subscribe()
-
-    // 订阅会话创建（当药剂师接受时）
-    const sessionChannel = supabase
-      .channel(`sessions:queue:${queue.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'consultation_sessions',
-          filter: `queue_id=eq.${queue.id}`
-        },
-        async (payload) => {
-          const newSession = payload.new
-          console.log('[ConsultationWaiting] New session created:', newSession.id)
-          
-          // 检查队列状态
-          const { data: currentQueue } = await supabase
-            .from('consultation_queue')
-            .select('*')
-            .eq('id', queue.id)
-            .single()
-          
-          if (currentQueue && (currentQueue.status === 'matched' || currentQueue.status === 'in_consultation')) {
-            await checkAndEnterChat(currentQueue)
-          }
-        }
-      )
-      .subscribe()
-
-    // 加载队列信息
-    loadQueueInfo()
-
-    // 定期更新队列信息
-    const interval = setInterval(() => {
-      loadQueueInfo()
-      loadOnlinePharmacistsCount()
-    }, 5000)
-
-    return () => {
-      queueChannel.unsubscribe()
-      sessionChannel.unsubscribe()
-      clearInterval(interval)
-    }
-  }, [queue?.id])
-
-  // 检查并进入聊天（只有确认有活跃会话且 queue_id 匹配时才进入）
-  const checkAndEnterChat = async (queueToCheck) => {
+  const checkExistingQueue = async () => {
     try {
-      // 检查是否有对应的活跃会话，且必须通过 queue_id 匹配
-      const { data: session } = await supabase
-        .from('consultation_sessions')
-        .select('id, status, queue_id')
-        .eq('queue_id', queueToCheck.id)
-        .eq('status', 'active')
-        .maybeSingle()
+      const { data, error } = await supabase
+        .from('consultation_queue')
+        .select('*')
+        .eq('patient_id', user.id)
+        .in('status', ['waiting', 'matched'])
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
 
-      if (session && session.status === 'active' && session.queue_id === queueToCheck.id) {
-        // 确认有活跃会话且 queue_id 匹配，说明药剂师已接受，可以进入聊天
-        console.log('[ConsultationWaiting] Active session confirmed with matching queue_id, entering chat')
-        if (onMatched) {
-          onMatched(queueToCheck)
+      if (error && error.code !== 'PGRST116') {
+        // PGRST116 = no rows returned
+        throw error
+      }
+
+      if (data) {
+        setQueue(data)
+        if (data.status === 'matched' && onMatched) {
+          onMatched(data)
         }
-      } else {
-        console.log('[ConsultationWaiting] Queue matched but no active session with matching queue_id yet, continuing to wait')
-        // 继续等待，会话可能还在创建中
       }
     } catch (error) {
-      console.error('[ConsultationWaiting] Error checking session:', error)
+      console.error('Error checking existing queue:', error)
     }
   }
 
-  // 加载在线药剂师数量
-  const loadOnlinePharmacistsCount = async () => {
+  const matchPharmacist = async (queueId) => {
     try {
-      const { count, error: countError } = await supabase
+      // 查找在线且不忙碌的药剂师
+      const { data: availablePharmacists, error } = await supabase
         .from('pharmacist_availability')
-        .select('*', { count: 'exact', head: true })
+        .select(`
+          *,
+          pharmacist:doctors(*)
+        `)
         .eq('is_online', true)
         .eq('is_busy', false)
+        .order('current_sessions_count', { ascending: true })
+        .limit(1)
 
-      if (!countError && count !== null) {
-        setOnlinePharmacists(count)
+      if (error) throw error
+
+      if (!availablePharmacists || availablePharmacists.length === 0) {
+        // 没有可用药剂师，继续等待
         return
       }
 
-      // 备用查询
-      const { data: pharmacists, error: altError } = await supabase
+      const pharmacist = availablePharmacists[0]
+
+      // 更新队列状态
+      const { error: updateError } = await supabase
+        .from('consultation_queue')
+        .update({
+          status: 'matched',
+          matched_pharmacist_id: pharmacist.pharmacist_id,
+          matched_at: new Date().toISOString()
+        })
+        .eq('id', queueId)
+
+      if (updateError) throw updateError
+
+      // 创建咨询会话
+      const { data: session, error: sessionError } = await supabase
+        .from('consultation_sessions')
+        .insert({
+          patient_id: user.id,
+          doctor_id: pharmacist.pharmacist_id,
+          queue_id: queueId,
+          consultation_type: 'realtime',
+          status: 'active',
+          started_at: new Date().toISOString()
+        })
+        .select()
+        .single()
+
+      if (sessionError) throw sessionError
+
+      // 更新药剂师状态
+      await supabase
         .from('pharmacist_availability')
-        .select('id')
-        .eq('is_online', true)
-        .eq('is_busy', false)
-      
-      if (!altError && pharmacists) {
-        setOnlinePharmacists(pharmacists.length)
-      } else {
-        setOnlinePharmacists(0)
+        .update({
+          is_busy: true,
+          current_session_id: session.id,
+          current_sessions_count: pharmacist.current_sessions_count + 1
+        })
+        .eq('id', pharmacist.id)
+
+      // 通知匹配成功
+      if (onMatched) {
+        onMatched({ ...queue, matched_pharmacist_id: pharmacist.pharmacist_id })
       }
     } catch (error) {
-      console.error('Error loading online pharmacists count:', error)
-      setOnlinePharmacists(0)
+      console.error('Error matching pharmacist:', error)
+      // 匹配失败，继续等待
     }
   }
 
-  // 加载队列信息（位置、等待时间）
   const loadQueueInfo = async () => {
     if (!queue?.id) return
 
     try {
-      // 只计算 'waiting' 状态的队列位置
+      // 计算队列位置
       const { data: waitingQueues, error } = await supabase
         .from('consultation_queue')
         .select('id, created_at')
@@ -264,20 +260,39 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
       const currentIndex = waitingQueues.findIndex(q => q.id === queue.id)
       if (currentIndex !== -1) {
         setPosition(currentIndex + 1)
-        // 计算预计等待时间（假设每个咨询平均5分钟）
-        const estimatedMinutes = (currentIndex + 1) * 5
-        setEstimatedWait(estimatedMinutes)
-      } else {
-        // 如果不在等待队列中，说明可能已被匹配
-        setPosition(null)
-        setEstimatedWait(null)
+      }
+
+      // 计算预计等待时间（假设每个咨询平均5分钟）
+      const estimatedMinutes = (currentIndex + 1) * 5
+      setEstimatedWait(estimatedMinutes)
+
+      // 获取在线药剂师数量
+      const { count, error: countError } = await supabase
+        .from('pharmacist_availability')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_online', true)
+        .eq('is_busy', false)
+
+      if (!countError && count !== null) {
+        setOnlinePharmacists(count)
+      } else if (countError) {
+        console.error('Error getting online pharmacists count:', countError)
+        // 如果查询失败，尝试另一种方式
+        const { data: pharmacists, error: altError } = await supabase
+          .from('pharmacist_availability')
+          .select('id')
+          .eq('is_online', true)
+          .eq('is_busy', false)
+        
+        if (!altError && pharmacists) {
+          setOnlinePharmacists(pharmacists.length)
+        }
       }
     } catch (error) {
       console.error('Error loading queue info:', error)
     }
   }
 
-  // 取消队列
   const handleCancel = async () => {
     if (!confirm('Are you sure you want to cancel? You will lose your position in the queue.')) {
       return
@@ -314,7 +329,7 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
         <div className="waiting-header">
           <div className="waiting-icon">⏳</div>
           <h2>Waiting for Pharmacist</h2>
-          <p className="waiting-subtitle">A pharmacist will review your request and accept your consultation</p>
+          <p className="waiting-subtitle">We're matching you with an available pharmacist</p>
         </div>
 
         <div className="waiting-info">
@@ -345,8 +360,8 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
         </div>
 
         <div className="waiting-message">
-          <p>Please wait while a pharmacist reviews your consultation request...</p>
-          <p className="waiting-tip">You will be notified when a pharmacist accepts your request.</p>
+          <p>Please wait while we connect you with a pharmacist...</p>
+          <p className="waiting-tip">You can minimize this window. We'll notify you when a pharmacist is available.</p>
         </div>
 
         <button className="cancel-button" onClick={handleCancel}>
@@ -358,3 +373,4 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
 }
 
 export default ConsultationWaiting
+
