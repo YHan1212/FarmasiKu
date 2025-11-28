@@ -437,8 +437,9 @@ function PharmacistDashboard({ user, onBack }) {
 
       const userRole = userProfile?.role
 
-      // 如果没有 pharmacistId，尝试为 role=doctor 创建
-      if (!pharmacistId) {
+      // 确保有 pharmacistId（用于会话管理）
+      let finalPharmacistId = pharmacistId
+      if (!finalPharmacistId) {
         if (userRole === 'doctor') {
           console.log('[PharmacistDashboard] role=doctor but no pharmacistId, creating doctor record...')
           const { data: newDoctor, error: createError } = await supabase
@@ -451,16 +452,46 @@ function PharmacistDashboard({ user, onBack }) {
             .single()
 
           if (!createError && newDoctor) {
+            finalPharmacistId = newDoctor.id
             setPharmacistId(newDoctor.id)
             await setOnlineStatus(newDoctor.id, true)
-            // 继续执行接受队列的逻辑
           } else {
-            alert(`Failed to create doctor record: ${createError?.message || 'Unknown error'}`)
-            return
+            throw new Error(`无法创建医生记录: ${createError?.message || '未知错误'}`)
+          }
+        } else if (userRole === 'admin') {
+          // Admin 可以接受队列，尝试查找或创建 doctor 记录（用于会话管理）
+          console.log('[PharmacistDashboard] role=admin, checking for doctor record...')
+          const { data: existingDoctor } = await supabase
+            .from('doctors')
+            .select('id')
+            .eq('user_id', user.id)
+            .maybeSingle()
+
+          if (existingDoctor) {
+            finalPharmacistId = existingDoctor.id
+            setPharmacistId(existingDoctor.id)
+            await setOnlineStatus(existingDoctor.id, true)
+          } else {
+            // 为 Admin 创建 doctor 记录（用于会话管理）
+            const { data: newDoctor, error: createError } = await supabase
+              .from('doctors')
+              .insert({
+                user_id: user.id,
+                name: 'Admin Doctor'
+              })
+              .select()
+              .single()
+
+            if (!createError && newDoctor) {
+              finalPharmacistId = newDoctor.id
+              setPharmacistId(newDoctor.id)
+              await setOnlineStatus(newDoctor.id, true)
+            } else {
+              throw new Error(`无法创建医生记录: ${createError?.message || '未知错误'}`)
+            }
           }
         } else {
-          alert('Please link a pharmacist account in the Admin panel first to accept consultations.')
-          return
+          throw new Error('请先在 Admin 面板中链接药剂师账户以接受咨询。')
         }
       }
 
@@ -469,14 +500,17 @@ function PharmacistDashboard({ user, onBack }) {
         .from('consultation_queue')
         .update({
           status: 'accepted',
-          pharmacist_id: pharmacistId,
-          matched_pharmacist_id: pharmacistId, // 保持向后兼容
+          pharmacist_id: finalPharmacistId,
+          matched_pharmacist_id: finalPharmacistId, // 保持向后兼容
           accepted_at: new Date().toISOString(),
           matched_at: new Date().toISOString()
         })
         .eq('id', queue.id)
 
-      if (updateQueueError) throw updateQueueError
+      if (updateQueueError) {
+        console.error('[PharmacistDashboard] Error updating queue:', updateQueueError)
+        throw updateQueueError
+      }
 
       // 检查是否已存在会话（可能被其他药剂师创建）
       let session = null
@@ -495,7 +529,7 @@ function PharmacistDashboard({ user, onBack }) {
         const { data: updatedSession, error: updateError } = await supabase
           .from('consultation_sessions')
           .update({
-            doctor_id: pharmacistId
+            doctor_id: finalPharmacistId
           })
           .eq('id', existingSession.id)
           .select(`
@@ -512,7 +546,7 @@ function PharmacistDashboard({ user, onBack }) {
           .from('consultation_sessions')
           .insert({
             patient_id: queue.patient_id,
-            doctor_id: pharmacistId,
+            doctor_id: finalPharmacistId,
             queue_id: queue.id,
             consultation_type: 'realtime',
             status: 'active',
