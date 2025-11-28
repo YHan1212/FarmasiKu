@@ -11,12 +11,23 @@ function PharmacistDashboard({ user, onBack }) {
   const [pharmacistId, setPharmacistId] = useState(null)
   const [isOnline, setIsOnline] = useState(false)
 
+  console.log('[PharmacistDashboard] Component rendered', {
+    userId: user?.id,
+    hasUser: !!user,
+    loading: loading
+  })
+
   useEffect(() => {
     if (!user) return
     loadPharmacistInfo()
   }, [user])
 
   useEffect(() => {
+    console.log('[PharmacistDashboard] useEffect triggered', {
+      user: user?.id,
+      pharmacistId: pharmacistId
+    })
+    
     // 即使没有 pharmacistId，也加载数据（Admin 可以查看所有队列）
     loadData()
     
@@ -31,6 +42,7 @@ function PharmacistDashboard({ user, onBack }) {
           table: 'consultation_queue'
         },
         () => {
+          console.log('[PharmacistDashboard] Realtime: consultation_queue changed, reloading...')
           loadData()
         }
       )
@@ -42,15 +54,18 @@ function PharmacistDashboard({ user, onBack }) {
           table: 'consultation_sessions'
         },
         () => {
+          console.log('[PharmacistDashboard] Realtime: consultation_sessions changed, reloading...')
           loadData()
         }
       )
-      .subscribe()
+      .subscribe((status) => {
+        console.log('[PharmacistDashboard] Realtime subscription status:', status)
+      })
 
     return () => {
       supabase.removeChannel(queueChannel)
     }
-  }, [pharmacistId])
+  }, [pharmacistId, user])
 
   const loadPharmacistInfo = async () => {
     try {
@@ -153,8 +168,15 @@ function PharmacistDashboard({ user, onBack }) {
         queueError: queueError,
         count: queues?.length || 0,
         userRole: userRole,
-        hasError: !!queueError
+        hasError: !!queueError,
+        userId: user?.id
       })
+      
+      // 如果查询成功但没有数据，检查是否是 RLS 问题
+      if (!queueError && (!queues || queues.length === 0) && userRole === 'admin') {
+        console.warn('[PharmacistDashboard] ⚠️ Admin user but no queues returned. Possible RLS issue.')
+        console.warn('[PharmacistDashboard] Check: 1. Run rebuild_consultation_queue_rls.sql 2. Verify user role is admin')
+      }
 
       // 加载患者信息
       if (queues && queues.length > 0) {
@@ -259,8 +281,22 @@ function PharmacistDashboard({ user, onBack }) {
 
       if (sessionError) throw sessionError
 
+      // 设置等待队列
+      console.log('[PharmacistDashboard] Setting state:', {
+        queuesCount: queues?.length || 0,
+        queues: queues,
+        sessionsCount: sessions?.length || 0
+      })
       setWaitingQueues(queues || [])
       setActiveSessions(sessions || [])
+      
+      // 调试信息
+      console.log('[PharmacistDashboard] Final state set:', {
+        waitingQueuesCount: queues?.length || 0,
+        activeSessionsCount: sessions?.length || 0,
+        userRole: userRole,
+        queuesArray: queues
+      })
       
       console.log('[PharmacistDashboard] Data loaded successfully:', {
         waitingQueuesCount: queues?.length || 0,
@@ -419,6 +455,13 @@ function PharmacistDashboard({ user, onBack }) {
     )
   }
 
+  console.log('[PharmacistDashboard] Rendering component', {
+    loading: loading,
+    waitingQueuesCount: waitingQueues.length,
+    activeSessionsCount: activeSessions.length,
+    pharmacistId: pharmacistId
+  })
+
   return (
     <div className="pharmacist-dashboard">
       <div className="pharmacist-header">
@@ -451,8 +494,18 @@ function PharmacistDashboard({ user, onBack }) {
           {/* 等待中的咨询 */}
           <div className="section">
             <h3>⏳ Waiting Consultations ({waitingQueues.length})</h3>
+            {console.log('[PharmacistDashboard] Rendering waiting queues section', {
+              waitingQueuesLength: waitingQueues.length,
+              waitingQueues: waitingQueues
+            })}
             {waitingQueues.length === 0 ? (
-              <div className="empty-state">No waiting consultations</div>
+              <div className="empty-state">
+                No waiting consultations
+                <br />
+                <small style={{ color: '#666', fontSize: '12px' }}>
+                  (Check browser console for debug info)
+                </small>
+              </div>
             ) : (
               <div className="queue-list">
                 {waitingQueues.map((queue) => {
