@@ -87,6 +87,16 @@ function PharmacistDashboard({ user, onBack }) {
 
   const loadPharmacistInfo = async () => {
     try {
+      // 检查用户角色
+      const { data: userProfile } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      const userRole = userProfile?.role
+      console.log('[PharmacistDashboard] User role:', userRole)
+
       // 查找当前用户关联的药剂师账号（可能有多个）
       const { data: doctorDataList, error } = await supabase
         .from('doctors')
@@ -95,7 +105,7 @@ function PharmacistDashboard({ user, onBack }) {
 
       if (error) {
         console.error('Error loading pharmacist info:', error)
-        // 即使没有 link pharmacist account，也允许查看队列（Admin 功能）
+        // 即使没有 link pharmacist account，也允许查看队列（Admin/Doctor 功能）
         return
       }
 
@@ -117,8 +127,26 @@ function PharmacistDashboard({ user, onBack }) {
           // 如果不存在，创建并设置为在线
           await setOnlineStatus(firstDoctor.id, true)
         }
+      } else if (userRole === 'doctor') {
+        // 如果是 role=doctor 但没有链接 doctors 表，自动创建一个
+        console.log('[PharmacistDashboard] role=doctor but no doctors record, creating one...')
+        const { data: newDoctor, error: createError } = await supabase
+          .from('doctors')
+          .insert({
+            user_id: user.id,
+            name: 'Doctor'
+          })
+          .select()
+          .single()
+
+        if (!createError && newDoctor) {
+          setPharmacistId(newDoctor.id)
+          await setOnlineStatus(newDoctor.id, true)
+        } else {
+          console.error('Error creating doctor record:', createError)
+        }
       }
-      // 如果没有 link pharmacist account，不显示错误，但 pharmacistId 会是 null
+      // 如果没有 link pharmacist account 且不是 doctor，不显示错误，但 pharmacistId 会是 null
       // 这样 Admin 仍然可以看到等待队列，但无法接受（因为没有 pharmacistId）
     } catch (error) {
       console.error('Error loading pharmacist info:', error)
@@ -396,9 +424,40 @@ function PharmacistDashboard({ user, onBack }) {
 
   const handleAcceptQueue = async (queue) => {
     try {
+      // 检查用户角色
+      const { data: userProfile } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      const userRole = userProfile?.role
+
+      // 如果没有 pharmacistId，尝试为 role=doctor 创建
       if (!pharmacistId) {
-        alert('Please link a pharmacist account in the Admin panel first to accept consultations.')
-        return
+        if (userRole === 'doctor') {
+          console.log('[PharmacistDashboard] role=doctor but no pharmacistId, creating doctor record...')
+          const { data: newDoctor, error: createError } = await supabase
+            .from('doctors')
+            .insert({
+              user_id: user.id,
+              name: 'Doctor'
+            })
+            .select()
+            .single()
+
+          if (!createError && newDoctor) {
+            setPharmacistId(newDoctor.id)
+            await setOnlineStatus(newDoctor.id, true)
+            // 继续执行接受队列的逻辑
+          } else {
+            alert(`Failed to create doctor record: ${createError?.message || 'Unknown error'}`)
+            return
+          }
+        } else {
+          alert('Please link a pharmacist account in the Admin panel first to accept consultations.')
+          return
+        }
       }
 
       // 步骤 1: 更新队列状态为 'accepted'，并设置匹配的药剂师
