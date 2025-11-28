@@ -13,6 +13,7 @@ function SimpleChat({ user, onBack, sessionId, isDoctor, otherUserInfo, onMedica
   const [recommendedMedications, setRecommendedMedications] = useState([])
   const [showRecommendForm, setShowRecommendForm] = useState(false)
   const [pharmacistUserId, setPharmacistUserId] = useState(null)
+  const [pharmacistInfo, setPharmacistInfo] = useState(null) // 存储药剂师信息（名字等）
   const messagesEndRef = useRef(null)
   const channelRef = useRef(null)
 
@@ -28,7 +29,7 @@ function SimpleChat({ user, onBack, sessionId, isDoctor, otherUserInfo, onMedica
       await Promise.all([
         loadMessages(),
         loadRecommendedMedications(),
-        loadPharmacistUserId()
+        loadPharmacistInfo()
       ])
       
       // 记录最后一条消息的时间戳
@@ -317,44 +318,58 @@ function SimpleChat({ user, onBack, sessionId, isDoctor, otherUserInfo, onMedica
     }
   }
 
-  const loadPharmacistUserId = async () => {
-    if (!isDoctor || !sessionId) return
-
+  const loadPharmacistInfo = async () => {
+    // 加载药剂师信息（名字等）
+    if (!session?.doctor_id) return
+    
     try {
-      // 获取会话信息，找到doctor_id
-      const { data: sessionData, error } = await supabase
-        .from('consultation_sessions')
-        .select('doctor_id, doctor:doctors(user_id)')
-        .eq('id', sessionId)
+      const { data: doctorData, error } = await supabase
+        .from('doctors')
+        .select('id, name, user_id')
+        .eq('id', session.doctor_id)
         .single()
-
-      if (error) throw error
-
-      if (sessionData?.doctor?.user_id) {
-        setPharmacistUserId(sessionData.doctor.user_id)
-      } else if (sessionData?.doctor_id) {
-        // 备用：直接从doctors表查询
-        const { data: doctorData } = await supabase
-          .from('doctors')
-          .select('user_id')
-          .eq('id', sessionData.doctor_id)
-          .single()
-
-        if (doctorData?.user_id) {
-          setPharmacistUserId(doctorData.user_id)
-        } else {
-          // 如果医生没有关联user_id，使用当前用户ID（测试模式）
-          setPharmacistUserId(user?.id)
-        }
-      } else {
-        // 如果查询失败，使用当前用户ID（假设当前用户就是药剂师）
-        setPharmacistUserId(user?.id)
+      
+      if (error) {
+        console.error('[SimpleChat] Error loading pharmacist info:', error)
+        return
+      }
+      
+      if (doctorData) {
+        setPharmacistInfo(doctorData)
+        setPharmacistUserId(doctorData.user_id)
+        console.log('[SimpleChat] Loaded pharmacist info:', doctorData)
       }
     } catch (error) {
-      console.error('Error loading pharmacist user ID:', error)
-      // 如果查询失败，使用当前用户ID（假设当前用户就是药剂师）
-      if (isDoctor) {
-        setPharmacistUserId(user?.id)
+      console.error('[SimpleChat] Error loading pharmacist info:', error)
+    }
+  }
+
+  // loadPharmacistUserId 已被 loadPharmacistInfo 替代，保留用于兼容性
+  const loadPharmacistUserId = async () => {
+    // 这个函数已经被 loadPharmacistInfo 替代
+    // 如果 session 没有 doctor_id，尝试从 sessionId 加载
+    if (!session?.doctor_id && sessionId) {
+      try {
+        const { data: sessionData } = await supabase
+          .from('consultation_sessions')
+          .select('doctor_id')
+          .eq('id', sessionId)
+          .single()
+        
+        if (sessionData?.doctor_id) {
+          const { data: doctorData } = await supabase
+            .from('doctors')
+            .select('id, name, user_id')
+            .eq('id', sessionData.doctor_id)
+            .single()
+          
+          if (doctorData) {
+            setPharmacistInfo(doctorData)
+            setPharmacistUserId(doctorData.user_id)
+          }
+        }
+      } catch (error) {
+        console.error('[SimpleChat] Error loading pharmacist from sessionId:', error)
       }
     }
   }
@@ -603,7 +618,7 @@ function SimpleChat({ user, onBack, sessionId, isDoctor, otherUserInfo, onMedica
           <h3>
             {isDoctor 
               ? `Patient: ${otherUserInfo?.name || otherUserInfo?.email || 'Patient'}`
-              : `Pharmacist: ${otherUserInfo?.name || 'Pharmacist'}`
+              : `Pharmacist: ${pharmacistInfo?.name || otherUserInfo?.name || session?.doctor?.name || 'Pharmacist'}`
             }
           </h3>
         </div>

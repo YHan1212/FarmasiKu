@@ -54,20 +54,21 @@ function PharmacistDashboard({ user, onBack }) {
 
   const loadPharmacistInfo = async () => {
     try {
-      // 查找当前用户关联的药剂师账号
-      const { data: doctorData, error } = await supabase
+      // 查找当前用户关联的药剂师账号（可能有多个）
+      const { data: doctorDataList, error } = await supabase
         .from('doctors')
-        .select('id, user_id')
+        .select('id, name, user_id')
         .eq('user_id', user.id)
-        .single()
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error('Error loading pharmacist info:', error)
         return
       }
 
-      if (doctorData) {
-        setPharmacistId(doctorData.id)
+      if (doctorDataList && doctorDataList.length > 0) {
+        // 使用第一个链接的药剂师 ID（如果有多个，可以后续扩展为选择）
+        const firstDoctor = doctorDataList[0]
+        setPharmacistId(firstDoctor.id)
         
         // 检查并设置在线状态
         const { data: availability } = await supabase
@@ -152,10 +153,14 @@ function PharmacistDashboard({ user, onBack }) {
       if (queueError) throw queueError
 
       // 加载活跃的会话
+      // 注意：由于 RLS 策略，任何链接的药剂师（通过 doctors.user_id）都能查看所有会话
+      // 所以这里查询所有活跃会话，RLS 会自动过滤
       const { data: sessions, error: sessionError } = await supabase
         .from('consultation_sessions')
-        .select('*')
-        .eq('doctor_id', pharmacistId)
+        .select(`
+          *,
+          doctor:doctors(*)
+        `)
         .in('status', ['active', 'in_progress'])
         .order('created_at', { ascending: false })
 
@@ -217,6 +222,11 @@ function PharmacistDashboard({ user, onBack }) {
 
   const handleAcceptQueue = async (queue) => {
     try {
+      if (!pharmacistId) {
+        alert('Please link a pharmacist account first.')
+        return
+      }
+
       // 更新队列状态为 'matched'，并设置匹配的药剂师
       const { error: updateQueueError } = await supabase
         .from('consultation_queue')
@@ -229,24 +239,55 @@ function PharmacistDashboard({ user, onBack }) {
 
       if (updateQueueError) throw updateQueueError
 
-      // 创建咨询会话
-      const { data: session, error: createError } = await supabase
+      // 检查是否已存在会话（可能被其他药剂师创建）
+      let session = null
+      const { data: existingSession } = await supabase
         .from('consultation_sessions')
-        .insert({
-          patient_id: queue.patient_id,
-          doctor_id: pharmacistId,
-          queue_id: queue.id,
-          consultation_type: 'realtime',
-          status: 'active',
-          started_at: new Date().toISOString()
-        })
         .select(`
           *,
           doctor:doctors(*)
         `)
-        .single()
+        .eq('queue_id', queue.id)
+        .eq('status', 'active')
+        .maybeSingle()
 
-      if (createError) throw createError
+      if (existingSession) {
+        // 如果已存在会话，更新 doctor_id 为当前药剂师（允许切换药剂师）
+        const { data: updatedSession, error: updateError } = await supabase
+          .from('consultation_sessions')
+          .update({
+            doctor_id: pharmacistId
+          })
+          .eq('id', existingSession.id)
+          .select(`
+            *,
+            doctor:doctors(*)
+          `)
+          .single()
+
+        if (updateError) throw updateError
+        session = updatedSession
+      } else {
+        // 创建新的咨询会话
+        const { data: newSession, error: createError } = await supabase
+          .from('consultation_sessions')
+          .insert({
+            patient_id: queue.patient_id,
+            doctor_id: pharmacistId,
+            queue_id: queue.id,
+            consultation_type: 'realtime',
+            status: 'active',
+            started_at: new Date().toISOString()
+          })
+          .select(`
+            *,
+            doctor:doctors(*)
+          `)
+          .single()
+
+        if (createError) throw createError
+        session = newSession
+      }
 
       // 更新队列状态为 'in_consultation'
       await supabase
