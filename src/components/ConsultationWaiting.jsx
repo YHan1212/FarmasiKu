@@ -78,7 +78,8 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
           const updatedQueue = payload.new
           setQueue(updatedQueue)
           
-          if (updatedQueue.status === 'matched') {
+          // 当队列状态变为 'matched' 或 'in_consultation' 时，通知父组件加载会话
+          if (updatedQueue.status === 'matched' || updatedQueue.status === 'in_consultation') {
             // 匹配成功，通知父组件
             if (onMatched) {
               onMatched(updatedQueue)

@@ -356,24 +356,41 @@ function PharmacistDashboard({ user, onBack }) {
               <div className="empty-state">No waiting consultations</div>
             ) : (
               <div className="queue-list">
-                {waitingQueues.map((queue) => (
-                  <div key={queue.id} className="queue-card">
-                    <div className="queue-info">
-                      <div className="queue-patient">
-                        <strong>Patient:</strong> {queue.patient?.name || queue.patient?.email || 'Unknown'}
+                {waitingQueues.map((queue) => {
+                  // 解析症状信息
+                  const symptoms = queue.symptoms || []
+                  const notes = queue.notes ? (typeof queue.notes === 'string' ? JSON.parse(queue.notes) : queue.notes) : {}
+                  const symptomInfo = notes.symptomAssessments || {}
+                  
+                  return (
+                    <div key={queue.id} className="queue-card">
+                      <div className="queue-info">
+                        <div className="queue-patient">
+                          <strong>Patient:</strong> {queue.patient?.name || queue.patient?.email || 'Unknown'}
+                        </div>
+                        {symptoms.length > 0 && (
+                          <div className="queue-symptoms">
+                            <strong>Symptoms:</strong> {symptoms.join(', ')}
+                          </div>
+                        )}
+                        {notes.userAge && (
+                          <div className="queue-age">
+                            <strong>Age:</strong> {notes.userAge}
+                          </div>
+                        )}
+                        <div className="queue-time">
+                          Joined: {new Date(queue.created_at).toLocaleString()}
+                        </div>
                       </div>
-                      <div className="queue-time">
-                        Matched: {new Date(queue.matched_at).toLocaleString()}
-                      </div>
+                      <button
+                        className="accept-btn"
+                        onClick={() => handleAcceptQueue(queue)}
+                      >
+                        Accept & Start Chat
+                      </button>
                     </div>
-                    <button
-                      className="accept-btn"
-                      onClick={() => handleAcceptQueue(queue)}
-                    >
-                      Accept & Start Chat
-                    </button>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
