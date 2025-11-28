@@ -1,10 +1,10 @@
 {
-  "commitHash": "d3b5e1b",
-  "commitHashFull": "d3b5e1bf8118058253df2c075faca725e0b7d542",
-  "commitDate": "2025/11/29 02:28:07",
-  "commitDateISO": "2025-11-29 02:28:07 +0800",
-  "commitMessage": "更新功能说明：反映当前使用 ConsultationQueue 的状态",
+  "commitHash": "97c6c08",
+  "commitHashFull": "97c6c08337f5c49f11da9bfdb03d841dd37e91e6",
+  "commitDate": "2025/11/29 02:35:26",
+  "commitDateISO": "2025-11-29 02:35:26 +0800",
+  "commitMessage": "添加咨询系统使用说明文档",
   "branch": "main",
-  "buildTime": "2025/11/29 02:31:00",
-  "buildTimeISO": "2025-11-28T18:31:00.683Z"
+  "buildTime": "2025/11/29 02:38:51",
+  "buildTimeISO": "2025-11-28T18:38:51.633Z"
 }
