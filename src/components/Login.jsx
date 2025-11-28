@@ -63,23 +63,6 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToForgotPassword }) {
 
   return (
     <div className="login-container">
-      {/* hi 文字 - 显示在左上角用于确认部署 */}
-      <div style={{
-        position: 'fixed',
-        top: '16px',
-        left: '16px',
-        background: '#3B82F6',
-        color: 'white',
-        padding: '8px 16px',
-        borderRadius: '8px',
-        fontSize: '14px',
-        fontWeight: 'bold',
-        zIndex: 1000,
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
-      }}>
-        hi
-      </div>
-      
       <div className="login-card">
         <h2>Login to farmasiKu</h2>
         <p className="login-subtitle">Access your orders and medication history</p>
@@ -164,9 +147,6 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToForgotPassword }) {
       
       {/* 版本信息 - 显示在右下角 */}
       <div className="version-info">
-        <div className="version-text" style={{ color: '#3B82F6', fontWeight: 'bold', fontSize: '12px', marginBottom: '4px' }}>
-          hi
-        </div>
         <div className="version-text">
           部署时间: {versionInfo?.buildTime || versionInfo?.commitDate || '未知'}
         </div>
