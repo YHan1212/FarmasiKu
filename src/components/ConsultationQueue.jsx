@@ -206,9 +206,12 @@ function ConsultationQueue({ user, onEnterChat, onCancel, symptoms, symptomAsses
           console.log('[ConsultationQueue] Queue updated:', updatedQueue.status)
           setQueue(updatedQueue)
           
-          // 如果状态变为 'accepted' 或 'in_chat'，检查是否有会话
-          if (updatedQueue.status === 'accepted' || updatedQueue.status === 'in_chat') {
+          // 只有当状态变为 'in_chat' 时，才进入聊天（admin 已接受并创建会话）
+          if (updatedQueue.status === 'in_chat') {
             await checkAndEnterChat(updatedQueue)
+          } else if (updatedQueue.status === 'accepted') {
+            // 状态为 'accepted'，等待进入 'in_chat'
+            console.log('[ConsultationQueue] Queue accepted by admin, waiting for chat session...')
           }
         }
       )
@@ -249,7 +252,8 @@ function ConsultationQueue({ user, onEnterChat, onCancel, symptoms, symptomAsses
         .eq('status', 'active')
         .maybeSingle()
 
-      if (session && (queueToCheck.status === 'accepted' || queueToCheck.status === 'in_chat')) {
+      // 只有当队列状态为 'in_chat' 且有活跃会话时，才进入聊天
+      if (session && queueToCheck.status === 'in_chat') {
         console.log('[ConsultationQueue] Active session found, entering chat')
         if (onEnterChat) {
           onEnterChat({ queue: queueToCheck, session })
