@@ -189,25 +189,25 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
     }
   }, [queue?.id])
 
-  // 检查并进入聊天（只有确认有活跃会话时才进入）
+  // 检查并进入聊天（只有确认有活跃会话且 queue_id 匹配时才进入）
   const checkAndEnterChat = async (queueToCheck) => {
     try {
-      // 检查是否有对应的活跃会话
+      // 检查是否有对应的活跃会话，且必须通过 queue_id 匹配
       const { data: session } = await supabase
         .from('consultation_sessions')
-        .select('id, status')
+        .select('id, status, queue_id')
         .eq('queue_id', queueToCheck.id)
         .eq('status', 'active')
         .maybeSingle()
 
-      if (session && session.status === 'active') {
-        // 确认有活跃会话，说明药剂师已接受，可以进入聊天
-        console.log('[ConsultationWaiting] Active session confirmed, entering chat')
+      if (session && session.status === 'active' && session.queue_id === queueToCheck.id) {
+        // 确认有活跃会话且 queue_id 匹配，说明药剂师已接受，可以进入聊天
+        console.log('[ConsultationWaiting] Active session confirmed with matching queue_id, entering chat')
         if (onMatched) {
           onMatched(queueToCheck)
         }
       } else {
-        console.log('[ConsultationWaiting] Queue matched but no active session yet, continuing to wait')
+        console.log('[ConsultationWaiting] Queue matched but no active session with matching queue_id yet, continuing to wait')
         // 继续等待，会话可能还在创建中
       }
     } catch (error) {
