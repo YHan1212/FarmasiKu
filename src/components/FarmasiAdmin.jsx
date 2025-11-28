@@ -7,6 +7,9 @@ import './FarmasiAdmin.css'
 
 function FarmasiAdmin({ user, onBack, onLogout }) {
   const [activeTab, setActiveTab] = useState('dashboard') // 'dashboard', 'orders', 'users', 'consultations', 'medications', 'doctors', 'pharmacist'
+  
+  console.log('[FarmasiAdmin] Component rendered, activeTab:', activeTab, 'user:', user?.id)
+  
   const [loading, setLoading] = useState(true)
   
   // Dashboard stats
@@ -778,7 +781,10 @@ function FarmasiAdmin({ user, onBack, onLogout }) {
         </button>
         <button
           className={`tab ${activeTab === 'pharmacist' ? 'active' : ''}`}
-          onClick={() => setActiveTab('pharmacist')}
+          onClick={() => {
+            console.log('[FarmasiAdmin] Clicking Pharmacist Dashboard tab')
+            setActiveTab('pharmacist')
+          }}
         >
           💬 Pharmacist Dashboard
         </button>
@@ -1090,10 +1096,13 @@ function FarmasiAdmin({ user, onBack, onLogout }) {
         )}
 
         {activeTab === 'pharmacist' && (
-          <PharmacistDashboard
-            user={user}
-            onBack={() => setActiveTab('dashboard')}
-          />
+          <>
+            {console.log('[FarmasiAdmin] Rendering PharmacistDashboard, user:', user?.id)}
+            <PharmacistDashboard
+              user={user}
+              onBack={() => setActiveTab('dashboard')}
+            />
+          </>
         )}
 
         {activeTab === 'medications' && (
