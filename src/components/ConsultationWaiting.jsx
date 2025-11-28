@@ -106,12 +106,12 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
 
   const createQueue = async () => {
     try {
-      // 检查是否已有等待中的队列
+      // 检查是否已有等待中的队列（只检查 'waiting' 状态）
       const { data: existingQueue } = await supabase
         .from('consultation_queue')
         .select('*')
         .eq('patient_id', user.id)
-        .in('status', ['waiting', 'matched', 'in_consultation'])
+        .eq('status', 'waiting')
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle()
@@ -119,10 +119,7 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
       if (existingQueue) {
         setQueue(existingQueue)
         setLoading(false)
-        // 如果已经是 matched 或 in_consultation 状态，直接进入聊天
-        if ((existingQueue.status === 'matched' || existingQueue.status === 'in_consultation') && onMatched) {
-          onMatched(existingQueue)
-        }
+        // 'waiting' 状态继续等待，不进入聊天
         return
       }
 
@@ -153,11 +150,13 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
 
   const checkExistingQueue = async () => {
     try {
+      // 只检查 'waiting' 状态的队列，不检查已匹配的
+      // 已匹配的队列会在实时订阅中处理
       const { data, error } = await supabase
         .from('consultation_queue')
         .select('*')
         .eq('patient_id', user.id)
-        .in('status', ['waiting', 'matched', 'in_consultation'])
+        .eq('status', 'waiting')
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle()
@@ -169,11 +168,7 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
 
       if (data) {
         setQueue(data)
-        // 只有在状态为 'matched' 或 'in_consultation' 时才自动进入聊天
-        // 'waiting' 状态应该继续等待
-        if ((data.status === 'matched' || data.status === 'in_consultation') && onMatched) {
-          onMatched(data)
-        }
+        // 'waiting' 状态继续等待，不进入聊天
       }
     } catch (error) {
       console.error('Error checking existing queue:', error)
