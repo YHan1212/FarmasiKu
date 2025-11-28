@@ -44,6 +44,7 @@ CREATE POLICY "Pharmacists can update queues"
   )
   WITH CHECK (
     -- 更新后的状态必须是 matched 或 in_consultation
-    new.status IN ('matched', 'in_consultation')
+    -- 在 WITH CHECK 中，直接使用列名，不需要 new. 前缀
+    consultation_queue.status IN ('matched', 'in_consultation')
   );
 
