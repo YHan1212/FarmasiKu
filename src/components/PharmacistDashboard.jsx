@@ -218,45 +218,56 @@ function PharmacistDashboard({ user, onBack }) {
 
   const handleAcceptQueue = async (queue) => {
     try {
-      // 查找或创建会话
-      let session = null
-      const { data: existingSession } = await supabase
+      // 更新队列状态为 'matched'，并设置匹配的药剂师
+      const { error: updateQueueError } = await supabase
+        .from('consultation_queue')
+        .update({
+          status: 'matched',
+          matched_pharmacist_id: pharmacistId,
+          matched_at: new Date().toISOString()
+        })
+        .eq('id', queue.id)
+
+      if (updateQueueError) throw updateQueueError
+
+      // 创建咨询会话
+      const { data: session, error: createError } = await supabase
         .from('consultation_sessions')
-        .select('*')
-        .eq('queue_id', queue.id)
+        .insert({
+          patient_id: queue.patient_id,
+          doctor_id: pharmacistId,
+          queue_id: queue.id,
+          consultation_type: 'realtime',
+          status: 'active',
+          started_at: new Date().toISOString()
+        })
+        .select(`
+          *,
+          doctor:doctors(*)
+        `)
         .single()
 
-      if (existingSession) {
-        session = existingSession
-      } else {
-        // 创建新会话
-        const { data: newSession, error: createError } = await supabase
-          .from('consultation_sessions')
-          .insert({
-            patient_id: queue.patient_id,
-            doctor_id: pharmacistId,
-            queue_id: queue.id,
-            status: 'active'
-          })
-          .select()
-          .single()
+      if (createError) throw createError
 
-        if (createError) throw createError
-        session = newSession
-      }
-
-      // 更新队列状态
+      // 更新队列状态为 'in_consultation'
       await supabase
         .from('consultation_queue')
         .update({ status: 'in_consultation' })
         .eq('id', queue.id)
 
       // 更新药剂师状态为忙碌
+      const { data: currentAvailability } = await supabase
+        .from('pharmacist_availability')
+        .select('current_sessions_count')
+        .eq('pharmacist_id', pharmacistId)
+        .single()
+
       await supabase
         .from('pharmacist_availability')
         .update({
           is_busy: true,
-          current_sessions_count: activeSessions.length + 1
+          current_session_id: session.id,
+          current_sessions_count: (currentAvailability?.current_sessions_count || 0) + 1
         })
         .eq('pharmacist_id', pharmacistId)
 

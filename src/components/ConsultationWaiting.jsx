@@ -136,8 +136,8 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
 
       setQueue(data)
       
-      // 尝试匹配药剂师
-      await matchPharmacist(data.id)
+      // 不再自动匹配，等待药剂师手动接受
+      // 用户进入队列后，药剂师会在 PharmacistDashboard 中看到通知
     } catch (error) {
       console.error('Error creating queue:', error)
       alert(`Failed to join queue: ${error.message}`)
