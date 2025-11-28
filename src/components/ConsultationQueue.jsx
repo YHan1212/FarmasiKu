@@ -283,41 +283,46 @@ function ConsultationQueue({ user, onEnterChat, onCancel, symptoms, symptomAsses
     <div className="consultation-queue">
       <div className="queue-container">
         <div className="queue-header">
-          <h2>⏳ 等待药剂师接听</h2>
-          <button className="cancel-btn" onClick={handleCancel}>
-            取消排队
-          </button>
+          <div className="waiting-icon">⏳</div>
+          <h2>Waiting for Pharmacist</h2>
+          <p className="waiting-subtitle">A pharmacist will review your request and accept your consultation</p>
         </div>
 
         <div className="queue-info">
-          {position && (
-            <div className="queue-position">
-              <div className="position-number">{position}</div>
-              <p>您前面有 {position - 1} 人</p>
+          <div className="info-card">
+            <div className="info-label">Your Position</div>
+            <div className="info-value">
+              {position !== null ? `#${position}` : 'Calculating...'}
             </div>
-          )}
+          </div>
 
-          {estimatedWait && (
-            <div className="estimated-wait">
-              <p>预计等待时间：约 {estimatedWait} 分钟</p>
+          <div className="info-card">
+            <div className="info-label">Estimated Wait</div>
+            <div className="info-value">
+              {estimatedWait !== null ? `${estimatedWait} min` : 'Calculating...'}
             </div>
-          )}
+          </div>
 
-          <div className="online-pharmacists">
-            <p>当前在线药剂师：{onlinePharmacists} 人</p>
+          <div className="info-card">
+            <div className="info-label">Online Pharmacists</div>
+            <div className="info-value">{onlinePharmacists}</div>
           </div>
         </div>
 
-        <div className="queue-status">
-          <div className="status-indicator waiting">
-            <div className="pulse"></div>
-            <p>等待中...</p>
-          </div>
+        <div className="waiting-animation">
+          <div className="pulse-circle"></div>
+          <div className="pulse-circle"></div>
+          <div className="pulse-circle"></div>
         </div>
 
-        <div className="queue-tips">
-          <p>💡 提示：请保持页面打开，药剂师接听后会自动进入聊天</p>
+        <div className="waiting-message">
+          <p>Please wait while a pharmacist reviews your consultation request...</p>
+          <p className="waiting-tip">You will be notified when a pharmacist accepts your request.</p>
         </div>
+
+        <button className="cancel-btn" onClick={handleCancel}>
+          Cancel
+        </button>
       </div>
     </div>
   )
