@@ -121,11 +121,18 @@ function PharmacistDashboard({ user, onBack }) {
       setLoading(true)
 
       // 加载等待中的队列（状态为 'waiting' 的队列，等待药剂师接受）
+      console.log('[PharmacistDashboard] Loading waiting queues...')
       const { data: queues, error: queueError } = await supabase
         .from('consultation_queue')
         .select('*')
         .eq('status', 'waiting')
         .order('created_at', { ascending: true })
+
+      console.log('[PharmacistDashboard] Waiting queues result:', { 
+        queues, 
+        queueError,
+        count: queues?.length || 0 
+      })
 
       // 加载患者信息
       if (queues && queues.length > 0) {
@@ -150,7 +157,17 @@ function PharmacistDashboard({ user, onBack }) {
         }
       }
 
-      if (queueError) throw queueError
+      if (queueError) {
+        console.error('[PharmacistDashboard] Error loading queues:', queueError)
+        console.error('[PharmacistDashboard] Error details:', {
+          message: queueError.message,
+          code: queueError.code,
+          details: queueError.details,
+          hint: queueError.hint
+        })
+        alert(`Failed to load waiting queues: ${queueError.message}\n\nPlease check:\n1. Are you logged in as admin?\n2. Is your role set to 'admin' in user_profiles?\n3. Run the SQL fix script: fix_admin_view_waiting_queues_v2.sql`)
+        throw queueError
+      }
 
       // 加载活跃的会话
       // 注意：由于 RLS 策略，任何链接的药剂师（通过 doctors.user_id）都能查看所有会话
@@ -212,9 +229,19 @@ function PharmacistDashboard({ user, onBack }) {
 
       setWaitingQueues(queues || [])
       setActiveSessions(sessions || [])
+      
+      console.log('[PharmacistDashboard] Data loaded successfully:', {
+        waitingQueuesCount: queues?.length || 0,
+        activeSessionsCount: sessions?.length || 0
+      })
     } catch (error) {
-      console.error('Error loading data:', error)
-      alert(`Failed to load data: ${error.message}`)
+      console.error('[PharmacistDashboard] Error loading data:', error)
+      console.error('[PharmacistDashboard] Full error:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      })
+      alert(`Failed to load data: ${error.message}\n\nCheck browser console for details.`)
     } finally {
       setLoading(false)
     }
