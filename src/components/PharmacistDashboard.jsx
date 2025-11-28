@@ -496,15 +496,16 @@ function PharmacistDashboard({ user, onBack }) {
       }
 
       // 步骤 1: 更新队列状态为 'accepted'，并设置匹配的药剂师
+      // 注意：只更新存在的列，避免 schema cache 错误
+      const updateData = {
+        status: 'accepted',
+        pharmacist_id: finalPharmacistId,
+        matched_pharmacist_id: finalPharmacistId // 保持向后兼容
+      }
+      
       const { error: updateQueueError } = await supabase
         .from('consultation_queue')
-        .update({
-          status: 'accepted',
-          pharmacist_id: finalPharmacistId,
-          matched_pharmacist_id: finalPharmacistId, // 保持向后兼容
-          accepted_at: new Date().toISOString(),
-          matched_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', queue.id)
 
       if (updateQueueError) {
