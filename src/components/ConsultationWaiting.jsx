@@ -183,33 +183,36 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
 
       if (activeQueue) {
         console.log('[ConsultationWaiting] Found active queue:', activeQueue.id, 'status:', activeQueue.status)
-        // 检查这个队列是否有对应的会话
+        // 检查这个队列是否有对应的活跃会话
         const { data: session, error: sessionError } = await supabase
           .from('consultation_sessions')
           .select('id, status')
           .eq('queue_id', activeQueue.id)
+          .eq('status', 'active')
           .maybeSingle()
         
         if (sessionError) {
           console.error('[ConsultationWaiting] Error checking session:', sessionError)
         }
         
-        if (session) {
-          console.log('[ConsultationWaiting] Found session for active queue, entering chat')
-          // 如果找到已匹配的队列且有会话，直接进入聊天
+        // 只有当会话存在且状态为 'active' 时，才允许进入聊天
+        // 这确保只有被药剂师明确接受的队列才能进入聊天
+        if (session && session.status === 'active') {
+          console.log('[ConsultationWaiting] Found active session for matched queue, entering chat')
+          // 如果找到已匹配的队列且有活跃会话，说明已被药剂师接受，可以进入聊天
           if (onMatched) {
-            console.log('[ConsultationWaiting] Calling onMatched for active queue with session')
+            console.log('[ConsultationWaiting] Calling onMatched for active queue with active session')
             onMatched(activeQueue)
           }
           return
         } else {
-          console.log('[ConsultationWaiting] Active queue found but no session, cancelling queue and creating new one')
-          // 如果队列已匹配但没有会话，可能是旧数据，取消它
+          console.log('[ConsultationWaiting] Active queue found but no active session, cancelling queue and creating new one')
+          // 如果队列已匹配但没有活跃会话，可能是旧数据或未完成的匹配，取消它
           await supabase
             .from('consultation_queue')
             .update({ status: 'cancelled' })
             .eq('id', activeQueue.id)
-          // 继续创建新队列
+          // 继续创建新队列，让用户重新等待药剂师接受
         }
       }
 
