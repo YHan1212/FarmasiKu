@@ -147,6 +147,9 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToForgotPassword }) {
       
       {/* 版本信息 - 显示在右下角 */}
       <div className="version-info">
+        <div className="version-text" style={{ color: '#3B82F6', fontWeight: 'bold', fontSize: '12px', marginBottom: '4px' }}>
+          hi
+        </div>
         <div className="version-text">
           部署时间: {versionInfo?.buildTime || versionInfo?.commitDate || '未知'}
         </div>
