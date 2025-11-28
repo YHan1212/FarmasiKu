@@ -80,7 +80,7 @@ function ConsultationQueue({ user, onEnterChat, onCancel, symptoms, symptomAsses
     }
   }
 
-  // 创建新队列
+  // 创建新队列并尝试自动匹配
   const createQueue = async () => {
     try {
       const notes = JSON.stringify({
@@ -97,8 +97,42 @@ function ConsultationQueue({ user, onEnterChat, onCancel, symptoms, symptomAsses
 
       console.log('[ConsultationQueue] Queue created:', data.id)
       setQueue(data)
-      updateQueueInfo(data.id)
-      loadOnlinePharmacistsCount()
+      
+      // 立即尝试自动匹配可用药剂师
+      console.log('[ConsultationQueue] Attempting to match pharmacist...')
+      try {
+        const matchResult = await consultationService.matchPharmacist(data.id)
+        
+        if (matchResult && matchResult.session) {
+          // 匹配成功，直接进入聊天
+          console.log('[ConsultationQueue] Pharmacist matched successfully, entering chat')
+          
+          // 重新获取更新后的队列信息（状态已更新为 'in_chat'）
+          const { data: updatedQueue } = await supabase
+            .from('consultation_queue')
+            .select('*')
+            .eq('id', data.id)
+            .single()
+          
+          if (onEnterChat) {
+            onEnterChat({ 
+              queue: updatedQueue || data, 
+              session: matchResult.session 
+            })
+          }
+          return
+        } else {
+          // 没有可用药剂师，显示等待界面
+          console.log('[ConsultationQueue] No available pharmacist, showing waiting screen')
+          updateQueueInfo(data.id)
+          loadOnlinePharmacistsCount()
+        }
+      } catch (matchError) {
+        // 匹配失败，显示等待界面
+        console.log('[ConsultationQueue] Match failed, showing waiting screen:', matchError.message)
+        updateQueueInfo(data.id)
+        loadOnlinePharmacistsCount()
+      }
     } catch (error) {
       console.error('Error creating queue:', error)
       alert(`Failed to join queue: ${error.message}`)

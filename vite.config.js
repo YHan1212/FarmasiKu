@@ -14,7 +14,11 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        format: 'es'
+        format: 'es',
+        // 确保每次构建都生成新的文件 hash
+        entryFileNames: 'assets/[name]-[hash].js',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
       }
     }
   }

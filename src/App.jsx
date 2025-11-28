@@ -298,7 +298,9 @@ function App() {
         }
 
         // 如果通过 queue_id 找不到，尝试通过 patient_id 和 doctor_id 查找
-        if (queue.matched_pharmacist_id) {
+        // 支持新的 pharmacist_id 字段和旧的 matched_pharmacist_id 字段
+        const pharmacistId = queue.pharmacist_id || queue.matched_pharmacist_id
+        if (pharmacistId) {
           const { data: altData, error: altError } = await supabase
             .from('consultation_sessions')
             .select(`
@@ -306,7 +308,7 @@ function App() {
               doctor:doctors(*)
             `)
             .eq('patient_id', user?.id)
-            .eq('doctor_id', queue.matched_pharmacist_id)
+            .eq('doctor_id', pharmacistId)
             .eq('status', 'active')
             .order('created_at', { ascending: false })
             .limit(1)
