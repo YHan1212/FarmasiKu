@@ -313,23 +313,8 @@ function App() {
           }
         }
         
-        // 如果还是找不到，尝试查找任何活跃的会话（可能被其他药剂师链接）
-        const { data: anySession, error: anyError } = await supabase
-          .from('consultation_sessions')
-          .select(`
-            *,
-            doctor:doctors(*)
-          `)
-          .eq('patient_id', user?.id)
-          .eq('status', 'active')
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle()
-        
-        if (!anyError && anySession) {
-          session = anySession
-          break
-        }
+        // 不再查找任何活跃会话，必须通过 queue_id 或 matched_pharmacist_id 匹配
+        // 这确保只有被药剂师明确接受的队列才能进入聊天
 
         // 如果还没找到，等待一下再重试
         if (retries > 1) {

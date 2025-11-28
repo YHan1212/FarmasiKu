@@ -34,23 +34,23 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
         .maybeSingle()
 
       if (activeQueue) {
-        // 检查是否有对应的活跃会话
+        // 检查是否有对应的活跃会话，且必须通过 queue_id 匹配
         const { data: session } = await supabase
           .from('consultation_sessions')
-          .select('id, status')
+          .select('id, status, queue_id')
           .eq('queue_id', activeQueue.id)
           .eq('status', 'active')
           .maybeSingle()
 
-        if (session && session.status === 'active') {
-          // 有活跃会话，直接进入聊天
-          console.log('[ConsultationWaiting] Found active session, entering chat')
+        if (session && session.status === 'active' && session.queue_id === activeQueue.id) {
+          // 有活跃会话且 queue_id 匹配，直接进入聊天
+          console.log('[ConsultationWaiting] Found active session with matching queue_id, entering chat')
           if (onMatched) {
             onMatched(activeQueue)
           }
           return
         } else {
-          // 队列已匹配但没有活跃会话，取消它（可能是旧数据）
+          // 队列已匹配但没有活跃会话，取消它（可能是旧数据或测试数据）
           console.log('[ConsultationWaiting] Active queue without active session, cancelling')
           await supabase
             .from('consultation_queue')
