@@ -260,6 +260,13 @@ function App() {
       return
     }
 
+    // 验证 queue 和 queue.id 是否存在
+    if (!queue || !queue.id) {
+      console.error('[App] loadMatchedSession: queue or queue.id is missing', queue)
+      alert('Invalid queue data. Please try again.')
+      return
+    }
+
     // 重试逻辑：会话可能还在创建中
     let retries = 5
     let session = null
@@ -274,6 +281,7 @@ function App() {
             doctor:doctors(*)
           `)
           .eq('queue_id', queue.id)
+          .eq('status', 'active')
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle()

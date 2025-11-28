@@ -74,14 +74,14 @@ function PharmacistDashboard({ user, onBack }) {
         const { data: availability } = await supabase
           .from('pharmacist_availability')
           .select('is_online')
-          .eq('pharmacist_id', doctorData.id)
+          .eq('pharmacist_id', firstDoctor.id)
           .single()
 
         if (availability) {
           setIsOnline(availability.is_online)
         } else {
           // 如果不存在，创建并设置为在线
-          await setOnlineStatus(doctorData.id, true)
+          await setOnlineStatus(firstDoctor.id, true)
         }
       } else {
         alert('您还没有关联药剂师账号。请在 Admin 面板中创建并关联药剂师账号。')
@@ -133,19 +133,19 @@ function PharmacistDashboard({ user, onBack }) {
         if (patientIds.length > 0) {
           const { data: patients } = await supabase
             .from('user_profiles')
-            .select('id, name, email')
+            .select('id')
             .in('id', patientIds)
 
-          // 将患者信息合并到队列中
+          // 将患者信息合并到队列中（user_profiles 没有 name 列）
           const patientsMap = {}
           if (patients) {
             patients.forEach(p => {
-              patientsMap[p.id] = p
+              patientsMap[p.id] = { id: p.id }
             })
           }
 
           queues.forEach(queue => {
-            queue.patient = patientsMap[queue.patient_id] || null
+            queue.patient = patientsMap[queue.patient_id] || { id: queue.patient_id }
           })
         }
       }
@@ -169,22 +169,22 @@ function PharmacistDashboard({ user, onBack }) {
         const patientIds = sessions.map(s => s.patient_id).filter(Boolean)
         const doctorIds = sessions.map(s => s.doctor_id).filter(Boolean)
 
-        // 加载患者信息
+        // 加载患者信息（user_profiles 没有 name 列）
         if (patientIds.length > 0) {
           const { data: patients } = await supabase
             .from('user_profiles')
-            .select('id, name, email')
+            .select('id')
             .in('id', patientIds)
 
           const patientsMap = {}
           if (patients) {
             patients.forEach(p => {
-              patientsMap[p.id] = p
+              patientsMap[p.id] = { id: p.id }
             })
           }
 
           sessions.forEach(session => {
-            session.patient = patientsMap[session.patient_id] || null
+            session.patient = patientsMap[session.patient_id] || { id: session.patient_id }
           })
         }
 
@@ -311,16 +311,16 @@ function PharmacistDashboard({ user, onBack }) {
         })
         .eq('pharmacist_id', pharmacistId)
 
-      // 加载患者信息
+      // 加载患者信息（user_profiles 没有 name 列）
       const { data: patientInfo } = await supabase
         .from('user_profiles')
-        .select('id, name, email')
+        .select('id')
         .eq('id', queue.patient_id)
         .single()
 
       setSelectedSession({
         ...session,
-        patient: patientInfo || { id: queue.patient_id }
+        patient: { id: queue.patient_id }
       })
     } catch (error) {
       console.error('Error accepting queue:', error)
@@ -329,16 +329,16 @@ function PharmacistDashboard({ user, onBack }) {
   }
 
   const handleSelectSession = async (session) => {
-    // 加载患者信息
+    // 加载患者信息（user_profiles 没有 name 列）
     const { data: patientInfo } = await supabase
       .from('user_profiles')
-      .select('id, name, email')
+      .select('id')
       .eq('id', session.patient_id)
       .single()
 
     setSelectedSession({
       ...session,
-      patient: patientInfo || { id: session.patient_id }
+      patient: { id: session.patient_id }
     })
   }
 
@@ -354,7 +354,7 @@ function PharmacistDashboard({ user, onBack }) {
         onBack={handleBackFromChat}
         sessionId={selectedSession.id}
         isDoctor={true}
-        otherUserInfo={selectedSession.patient || { name: 'Patient' }}
+        otherUserInfo={selectedSession.patient || { id: selectedSession.patient_id }}
         session={selectedSession}
       />
     )
@@ -406,7 +406,7 @@ function PharmacistDashboard({ user, onBack }) {
                     <div key={queue.id} className="queue-card">
                       <div className="queue-info">
                         <div className="queue-patient">
-                          <strong>Patient:</strong> {queue.patient?.name || queue.patient?.email || 'Unknown'}
+                          <strong>Patient:</strong> {queue.patient?.email || queue.patient_id || 'Unknown'}
                         </div>
                         {symptoms.length > 0 && (
                           <div className="queue-symptoms">
@@ -446,7 +446,7 @@ function PharmacistDashboard({ user, onBack }) {
                   <div key={session.id} className="session-card">
                     <div className="session-info">
                       <div className="session-patient">
-                        <strong>Patient:</strong> {session.patient?.name || session.patient?.email || 'Unknown'}
+                        <strong>Patient:</strong> {session.patient?.email || session.patient_id || 'Unknown'}
                       </div>
                       <div className="session-time">
                         Started: {new Date(session.created_at).toLocaleString()}
