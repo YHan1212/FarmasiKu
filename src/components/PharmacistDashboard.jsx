@@ -62,6 +62,7 @@ function PharmacistDashboard({ user, onBack }) {
 
       if (error) {
         console.error('Error loading pharmacist info:', error)
+        // 即使没有 link pharmacist account，也允许查看队列（Admin 功能）
         return
       }
 
@@ -83,12 +84,12 @@ function PharmacistDashboard({ user, onBack }) {
           // 如果不存在，创建并设置为在线
           await setOnlineStatus(firstDoctor.id, true)
         }
-      } else {
-        alert('您还没有关联药剂师账号。请在 Admin 面板中创建并关联药剂师账号。')
-        if (onBack) onBack()
       }
+      // 如果没有 link pharmacist account，不显示错误，但 pharmacistId 会是 null
+      // 这样 Admin 仍然可以看到等待队列，但无法接受（因为没有 pharmacistId）
     } catch (error) {
       console.error('Error loading pharmacist info:', error)
+      // 即使出错，也允许查看队列
     }
   }
 
@@ -223,7 +224,7 @@ function PharmacistDashboard({ user, onBack }) {
   const handleAcceptQueue = async (queue) => {
     try {
       if (!pharmacistId) {
-        alert('Please link a pharmacist account first.')
+        alert('Please link a pharmacist account in the Admin panel first to accept consultations.')
         return
       }
 
@@ -422,12 +423,18 @@ function PharmacistDashboard({ user, onBack }) {
                           Joined: {new Date(queue.created_at).toLocaleString()}
                         </div>
                       </div>
-                      <button
-                        className="accept-btn"
-                        onClick={() => handleAcceptQueue(queue)}
-                      >
-                        Accept & Start Chat
-                      </button>
+                      {pharmacistId ? (
+                        <button
+                          className="accept-btn"
+                          onClick={() => handleAcceptQueue(queue)}
+                        >
+                          Accept & Start Chat
+                        </button>
+                      ) : (
+                        <div className="link-required-message">
+                          <p>⚠️ Please link a pharmacist account in Admin panel to accept consultations</p>
+                        </div>
+                      )}
                     </div>
                   )
                 })}
