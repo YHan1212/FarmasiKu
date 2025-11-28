@@ -111,14 +111,18 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
         .from('consultation_queue')
         .select('*')
         .eq('patient_id', user.id)
-        .in('status', ['waiting', 'matched'])
+        .in('status', ['waiting', 'matched', 'in_consultation'])
         .order('created_at', { ascending: false })
         .limit(1)
-        .single()
+        .maybeSingle()
 
       if (existingQueue) {
         setQueue(existingQueue)
         setLoading(false)
+        // 如果已经是 matched 或 in_consultation 状态，直接进入聊天
+        if ((existingQueue.status === 'matched' || existingQueue.status === 'in_consultation') && onMatched) {
+          onMatched(existingQueue)
+        }
         return
       }
 
@@ -153,10 +157,10 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
         .from('consultation_queue')
         .select('*')
         .eq('patient_id', user.id)
-        .in('status', ['waiting', 'matched'])
+        .in('status', ['waiting', 'matched', 'in_consultation'])
         .order('created_at', { ascending: false })
         .limit(1)
-        .single()
+        .maybeSingle()
 
       if (error && error.code !== 'PGRST116') {
         // PGRST116 = no rows returned
@@ -165,7 +169,9 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
 
       if (data) {
         setQueue(data)
-        if (data.status === 'matched' && onMatched) {
+        // 只有在状态为 'matched' 或 'in_consultation' 时才自动进入聊天
+        // 'waiting' 状态应该继续等待
+        if ((data.status === 'matched' || data.status === 'in_consultation') && onMatched) {
           onMatched(data)
         }
       }

@@ -119,13 +119,12 @@ function PharmacistDashboard({ user, onBack }) {
     try {
       setLoading(true)
 
-      // 加载等待中的队列（已匹配但未开始的）
+      // 加载等待中的队列（状态为 'waiting' 的队列，等待药剂师接受）
       const { data: queues, error: queueError } = await supabase
         .from('consultation_queue')
         .select('*')
-        .eq('matched_pharmacist_id', pharmacistId)
-        .eq('status', 'matched')
-        .order('matched_at', { ascending: true })
+        .eq('status', 'waiting')
+        .order('created_at', { ascending: true })
 
       // 加载患者信息
       if (queues && queues.length > 0) {
