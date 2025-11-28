@@ -317,6 +317,7 @@ function PharmacistDashboard({ user, onBack }) {
 
       // 加载活跃的会话（in_chat 状态的队列对应的会话）
       let sessions = []
+      let sessionError = null
       if (pharmacistId) {
         // 先查找当前药剂师的 in_chat 队列
         const { data: activeQueues } = await supabase
@@ -327,7 +328,7 @@ function PharmacistDashboard({ user, onBack }) {
         
         if (activeQueues && activeQueues.length > 0) {
           const queueIds = activeQueues.map(q => q.id)
-          const { data: sessionsData, error: sessionError } = await supabase
+          const { data: sessionsData, error: err } = await supabase
             .from('consultation_sessions')
             .select(`
               *,
@@ -337,7 +338,10 @@ function PharmacistDashboard({ user, onBack }) {
             .eq('status', 'active')
             .order('created_at', { ascending: false })
           
-          if (sessionError) throw sessionError
+          if (err) {
+            sessionError = err
+            throw err
+          }
           sessions = sessionsData || []
         }
       }
@@ -386,7 +390,7 @@ function PharmacistDashboard({ user, onBack }) {
         }
       }
 
-      if (sessionError) throw sessionError
+      // sessionError 已经在上面处理了，这里不需要再次检查
 
       // 设置等待队列
       console.log('[PharmacistDashboard] Setting state:', {
