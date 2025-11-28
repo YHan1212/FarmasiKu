@@ -45,12 +45,12 @@ CREATE POLICY "Admins can view all waiting queues"
     )
   );
 
--- 策略 3: Admin 可以查看所有 matched/in_consultation 队列
+-- 策略 3: Admin 可以查看所有 accepted/in_chat 队列
 CREATE POLICY "Admins can view matched queues"
   ON public.consultation_queue
   FOR SELECT
   USING (
-    status IN ('matched', 'in_consultation') AND 
+    status IN ('accepted', 'in_chat') AND 
     EXISTS (
       SELECT 1 FROM public.user_profiles
       WHERE user_profiles.id = auth.uid()
@@ -104,7 +104,7 @@ CREATE POLICY "Linked pharmacists can accept queues"
     )
   )
   WITH CHECK (
-    consultation_queue.status IN ('matched', 'in_consultation')
+    consultation_queue.status IN ('accepted', 'in_chat')
   );
 
 -- 策略 3: 链接了 pharmacist account 的用户可以更新已接受的队列
@@ -112,7 +112,7 @@ CREATE POLICY "Linked pharmacists can update accepted queues"
   ON public.consultation_queue
   FOR UPDATE
   USING (
-    status IN ('matched', 'in_consultation') AND 
+    status IN ('accepted', 'in_chat') AND 
     EXISTS (
       SELECT 1 FROM public.doctors
       WHERE doctors.id = consultation_queue.matched_pharmacist_id
@@ -120,7 +120,7 @@ CREATE POLICY "Linked pharmacists can update accepted queues"
     )
   )
   WITH CHECK (
-    consultation_queue.status IN ('matched', 'in_consultation')
+    consultation_queue.status IN ('accepted', 'in_chat')
   );
 
 -- ============================================

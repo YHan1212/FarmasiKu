@@ -164,6 +164,7 @@ function PharmacistDashboard({ user, onBack }) {
         .eq('status', 'waiting')
         .order('created_at', { ascending: true })
 
+      console.log('[PharmacistDashboard] ========== QUEUE QUERY RESULT ==========')
       console.log('[PharmacistDashboard] Waiting queues result:', { 
         queues: queues || [],
         queueError: queueError,
@@ -173,11 +174,39 @@ function PharmacistDashboard({ user, onBack }) {
         userId: user?.id
       })
       
+      // 详细错误信息
+      if (queueError) {
+        console.error('[PharmacistDashboard] ❌ QUERY ERROR:', {
+          message: queueError.message,
+          code: queueError.code,
+          details: queueError.details,
+          hint: queueError.hint
+        })
+      }
+      
       // 如果查询成功但没有数据，检查是否是 RLS 问题
       if (!queueError && (!queues || queues.length === 0) && userRole === 'admin') {
-        console.warn('[PharmacistDashboard] ⚠️ Admin user but no queues returned. Possible RLS issue.')
-        console.warn('[PharmacistDashboard] Check: 1. Run rebuild_consultation_queue_rls.sql 2. Verify user role is admin')
+        console.warn('[PharmacistDashboard] ⚠️⚠️⚠️ ADMIN USER BUT NO QUEUES RETURNED ⚠️⚠️⚠️')
+        console.warn('[PharmacistDashboard] This indicates a possible RLS policy issue.')
+        console.warn('[PharmacistDashboard] ACTION REQUIRED:')
+        console.warn('[PharmacistDashboard] 1. Go to Supabase SQL Editor')
+        console.warn('[PharmacistDashboard] 2. Run: database/rebuild_consultation_queue_rls.sql')
+        console.warn('[PharmacistDashboard] 3. Verify your role is "admin" in user_profiles table')
+        console.warn('[PharmacistDashboard] 4. Check if there are any waiting queues in the database')
+      } else if (!queueError && queues && queues.length > 0) {
+        console.log('[PharmacistDashboard] ✅ SUCCESS: Found', queues.length, 'waiting queue(s)')
+        queues.forEach((q, idx) => {
+          console.log(`[PharmacistDashboard] Queue ${idx + 1}:`, {
+            id: q.id,
+            patient_id: q.patient_id,
+            status: q.status,
+            created_at: q.created_at
+          })
+        })
+      } else if (!queueError && (!queues || queues.length === 0)) {
+        console.log('[PharmacistDashboard] ℹ️ No waiting queues found (this is normal if no users are waiting)')
       }
+      console.log('[PharmacistDashboard] ==========================================')
 
       // 加载患者信息
       if (queues && queues.length > 0) {
