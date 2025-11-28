@@ -224,17 +224,32 @@ function PharmacistDashboard({ user, onBack }) {
         })
       }
 
-      // 加载活跃的会话
-      // 注意：由于 RLS 策略，任何链接的药剂师（通过 doctors.user_id）都能查看所有会话
-      // 所以这里查询所有活跃会话，RLS 会自动过滤
-      const { data: sessions, error: sessionError } = await supabase
-        .from('consultation_sessions')
-        .select(`
-          *,
-          doctor:doctors(*)
-        `)
-        .in('status', ['active', 'in_progress'])
-        .order('created_at', { ascending: false })
+      // 加载活跃的会话（in_chat 状态的队列对应的会话）
+      let sessions = []
+      if (pharmacistId) {
+        // 先查找当前药剂师的 in_chat 队列
+        const { data: activeQueues } = await supabase
+          .from('consultation_queue')
+          .select('id')
+          .eq('status', 'in_chat')
+          .eq('pharmacist_id', pharmacistId)
+        
+        if (activeQueues && activeQueues.length > 0) {
+          const queueIds = activeQueues.map(q => q.id)
+          const { data: sessionsData, error: sessionError } = await supabase
+            .from('consultation_sessions')
+            .select(`
+              *,
+              doctor:doctors(*)
+            `)
+            .in('queue_id', queueIds)
+            .eq('status', 'active')
+            .order('created_at', { ascending: false })
+          
+          if (sessionError) throw sessionError
+          sessions = sessionsData || []
+        }
+      }
 
       // 加载患者和医生信息
       if (sessions && sessions.length > 0) {
@@ -323,12 +338,14 @@ function PharmacistDashboard({ user, onBack }) {
         return
       }
 
-      // 更新队列状态为 'matched'，并设置匹配的药剂师
+      // 步骤 1: 更新队列状态为 'accepted'，并设置匹配的药剂师
       const { error: updateQueueError } = await supabase
         .from('consultation_queue')
         .update({
-          status: 'matched',
-          matched_pharmacist_id: pharmacistId,
+          status: 'accepted',
+          pharmacist_id: pharmacistId,
+          matched_pharmacist_id: pharmacistId, // 保持向后兼容
+          accepted_at: new Date().toISOString(),
           matched_at: new Date().toISOString()
         })
         .eq('id', queue.id)
@@ -385,10 +402,13 @@ function PharmacistDashboard({ user, onBack }) {
         session = newSession
       }
 
-      // 更新队列状态为 'in_consultation'
+      // 步骤 2: 更新队列状态为 'in_chat'
       await supabase
         .from('consultation_queue')
-        .update({ status: 'in_consultation' })
+        .update({ 
+          status: 'in_chat',
+          started_at: new Date().toISOString()
+        })
         .eq('id', queue.id)
 
       // 更新药剂师状态为忙碌

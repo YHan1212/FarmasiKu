@@ -22,6 +22,7 @@ import Profile from './components/Profile'
 import FarmasiAdmin from './components/FarmasiAdmin'
 import SimpleChat from './components/SimpleChat'
 import ConsultationWaiting from './components/ConsultationWaiting'
+import ConsultationQueue from './components/ConsultationQueue'
 import ConsultationMedicationReview from './components/ConsultationMedicationReview'
 import { supabase } from './lib/supabase'
 import { bodyParts, symptomsByBodyPart, medicationsBySymptoms, hasDangerousSymptoms, dangerousSymptoms, getStepInfo, getAgeCategory, getAgeRestrictions, medicationUsage } from './data/appData'
@@ -1118,15 +1119,21 @@ function App() {
         )}
 
         {step === 'consultation-waiting' && user && (
-          <ConsultationWaiting
+          <ConsultationQueue
             user={user}
             symptoms={selectedSymptoms}
             symptomAssessments={symptomAssessments}
             selectedBodyPart={selectedBodyPart}
             userAge={userAge}
-            onMatched={(queue) => {
-              // 当匹配成功时，加载会话并跳转到聊天
-              loadMatchedSession(queue)
+            onEnterChat={async ({ queue, session }) => {
+              // 当进入聊天时，设置会话并跳转
+              if (session) {
+                setCurrentConsultationSession(session)
+                setStep('consultation-patient')
+              } else {
+                // 如果没有会话，尝试加载
+                await loadMatchedSession(queue)
+              }
             }}
             onCancel={() => {
               setStep('welcome')
