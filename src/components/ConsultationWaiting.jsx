@@ -87,12 +87,32 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
           const updatedQueue = payload.new
           setQueue(updatedQueue)
           
-          // 当队列状态变为 'matched' 或 'in_consultation' 时，通知父组件加载会话
+          // 当队列状态变为 'matched' 或 'in_consultation' 时，检查是否有活跃会话
+          // 只有确认有活跃会话时，才通知父组件进入聊天（确保药剂师已接受）
           if (updatedQueue.status === 'matched' || updatedQueue.status === 'in_consultation') {
-            // 匹配成功，通知父组件
-            if (onMatched) {
-              onMatched(updatedQueue)
-            }
+            // 检查是否有对应的活跃会话
+            supabase
+              .from('consultation_sessions')
+              .select('id, status')
+              .eq('queue_id', updatedQueue.id)
+              .eq('status', 'active')
+              .maybeSingle()
+              .then(({ data: session }) => {
+                // 只有当会话存在且状态为 'active' 时，才进入聊天
+                // 这确保只有被药剂师明确接受的队列才能进入聊天
+                if (session && session.status === 'active') {
+                  console.log('[ConsultationWaiting] Queue matched and session is active, entering chat')
+                  if (onMatched) {
+                    onMatched(updatedQueue)
+                  }
+                } else {
+                  console.log('[ConsultationWaiting] Queue matched but no active session yet, continuing to wait')
+                  // 如果还没有活跃会话，继续等待（药剂师可能还在处理）
+                }
+              })
+              .catch((error) => {
+                console.error('[ConsultationWaiting] Error checking session:', error)
+              })
           }
         }
       )
