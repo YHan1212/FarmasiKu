@@ -17,38 +17,38 @@ function PharmacistDashboard({ user, onBack }) {
   }, [user])
 
   useEffect(() => {
-    if (pharmacistId) {
-      loadData()
-      // Set up realtime subscriptions
-      const queueChannel = supabase
-        .channel('pharmacist_queue')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'consultation_queue'
-          },
-          () => {
-            loadData()
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'consultation_sessions'
-          },
-          () => {
-            loadData()
-          }
-        )
-        .subscribe()
+    // 即使没有 pharmacistId，也加载数据（Admin 可以查看所有队列）
+    loadData()
+    
+    // Set up realtime subscriptions
+    const queueChannel = supabase
+      .channel('pharmacist_queue')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'consultation_queue'
+        },
+        () => {
+          loadData()
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'consultation_sessions'
+        },
+        () => {
+          loadData()
+        }
+      )
+      .subscribe()
 
-      return () => {
-        supabase.removeChannel(queueChannel)
-      }
+    return () => {
+      supabase.removeChannel(queueChannel)
     }
   }, [pharmacistId])
 
@@ -116,8 +116,7 @@ function PharmacistDashboard({ user, onBack }) {
   }
 
   const loadData = async () => {
-    if (!pharmacistId) return
-
+    // 即使没有 pharmacistId，也加载数据（Admin 可以查看所有队列）
     try {
       setLoading(true)
 
