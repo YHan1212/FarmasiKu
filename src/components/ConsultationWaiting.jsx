@@ -13,14 +13,23 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
   useEffect(() => {
     if (!user) return
 
-    // 先加载在线药剂师数量
-    loadOnlinePharmacistsCount()
+    console.log('[ConsultationWaiting] Component mounted, user:', user.id)
 
-    // 创建队列记录
-    createQueue()
-
-    // 检查是否已有队列
-    checkExistingQueue()
+    // 先检查是否已有队列（包括已匹配的）
+    checkExistingQueue().then(() => {
+      // 检查完成后，如果没有队列，再创建新队列
+      if (!queue) {
+        console.log('[ConsultationWaiting] No existing queue found, creating new queue')
+        // 先加载在线药剂师数量
+        loadOnlinePharmacistsCount()
+        // 创建队列记录
+        createQueue()
+      } else {
+        console.log('[ConsultationWaiting] Found existing queue:', queue.id, 'status:', queue.status)
+        // 如果已有队列，加载在线药剂师数量
+        loadOnlinePharmacistsCount()
+      }
+    })
   }, [user])
 
   // 加载在线药剂师数量
@@ -136,10 +145,16 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
         notes
       )
 
+      console.log('[ConsultationWaiting] Queue created:', data.id, 'status:', data.status)
       setQueue(data)
       
       // 不再自动匹配，等待药剂师手动接受
       // 用户进入队列后，药剂师会在 PharmacistDashboard 中看到通知
+      
+      // 确保队列状态是 'waiting'
+      if (data.status !== 'waiting') {
+        console.warn('[ConsultationWaiting] Warning: Queue status is not "waiting":', data.status)
+      }
     } catch (error) {
       console.error('Error creating queue:', error)
       alert(`Failed to join queue: ${error.message}`)
@@ -150,9 +165,34 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
 
   const checkExistingQueue = async () => {
     try {
-      // 只检查 'waiting' 状态的队列，不检查已匹配的
-      // 已匹配的队列会在实时订阅中处理
-      const { data, error } = await supabase
+      console.log('[ConsultationWaiting] Checking for existing queues for user:', user.id)
+      
+      // 首先检查是否有已匹配或进行中的队列
+      const { data: activeQueue, error: activeError } = await supabase
+        .from('consultation_queue')
+        .select('*')
+        .eq('patient_id', user.id)
+        .in('status', ['matched', 'in_consultation'])
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (activeError && activeError.code !== 'PGRST116') {
+        console.error('[ConsultationWaiting] Error checking active queue:', activeError)
+      }
+
+      if (activeQueue) {
+        console.log('[ConsultationWaiting] Found active queue:', activeQueue.id, 'status:', activeQueue.status)
+        // 如果找到已匹配的队列，直接进入聊天
+        if (onMatched) {
+          console.log('[ConsultationWaiting] Calling onMatched for active queue')
+          onMatched(activeQueue)
+        }
+        return
+      }
+
+      // 如果没有已匹配的队列，检查是否有等待中的队列
+      const { data: waitingQueue, error: waitingError } = await supabase
         .from('consultation_queue')
         .select('*')
         .eq('patient_id', user.id)
@@ -161,17 +201,19 @@ function ConsultationWaiting({ user, onMatched, onCancel, symptoms, symptomAsses
         .limit(1)
         .maybeSingle()
 
-      if (error && error.code !== 'PGRST116') {
-        // PGRST116 = no rows returned
-        throw error
+      if (waitingError && waitingError.code !== 'PGRST116') {
+        console.error('[ConsultationWaiting] Error checking waiting queue:', waitingError)
       }
 
-      if (data) {
-        setQueue(data)
+      if (waitingQueue) {
+        console.log('[ConsultationWaiting] Found waiting queue:', waitingQueue.id)
+        setQueue(waitingQueue)
         // 'waiting' 状态继续等待，不进入聊天
+      } else {
+        console.log('[ConsultationWaiting] No existing queue found')
       }
     } catch (error) {
-      console.error('Error checking existing queue:', error)
+      console.error('[ConsultationWaiting] Error checking existing queue:', error)
     }
   }
 
