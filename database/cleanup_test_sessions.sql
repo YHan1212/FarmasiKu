@@ -10,10 +10,10 @@ SELECT
   cs.status,
   cs.created_at,
   d.name as doctor_name,
-  up.name as patient_name
+  au.email as patient_email
 FROM public.consultation_sessions cs
 LEFT JOIN public.doctors d ON d.id = cs.doctor_id
-LEFT JOIN public.user_profiles up ON up.id = cs.patient_id
+LEFT JOIN auth.users au ON au.id = cs.patient_id
 WHERE cs.status = 'active'
 ORDER BY cs.created_at DESC;
 
@@ -24,9 +24,9 @@ SELECT
   cq.status,
   cq.matched_pharmacist_id,
   cq.created_at,
-  up.name as patient_name
+  au.email as patient_email
 FROM public.consultation_queue cq
-LEFT JOIN public.user_profiles up ON up.id = cq.patient_id
+LEFT JOIN auth.users au ON au.id = cq.patient_id
 WHERE cq.status IN ('waiting', 'matched', 'in_consultation')
 ORDER BY cq.created_at DESC;
 
