@@ -260,6 +260,8 @@ function App() {
       return
     }
 
+    console.log('[App] loadMatchedSession called with queue:', queue)
+
     // 验证 queue 和 queue.id 是否存在
     if (!queue || !queue.id) {
       console.error('[App] loadMatchedSession: queue or queue.id is missing', queue)
@@ -273,6 +275,8 @@ function App() {
 
     while (retries > 0 && !session) {
       try {
+        console.log(`[App] Attempting to load session (retry ${6 - retries}/5) for queue:`, queue.id)
+        
         // 首先尝试通过 queue_id 查找
         let { data, error } = await supabase
           .from('consultation_sessions')
@@ -288,18 +292,23 @@ function App() {
 
         if (error && error.code !== 'PGRST116') {
           // PGRST116 = no rows returned, 这是正常的
+          console.error('[App] Error querying session by queue_id:', error)
           throw error
         }
 
         if (data) {
+          console.log('[App] Session found by queue_id:', data.id)
           session = data
           break
         }
+
+        console.log('[App] No session found by queue_id, trying alternative method...')
 
         // 如果通过 queue_id 找不到，尝试通过 patient_id 和 doctor_id 查找
         // 支持新的 pharmacist_id 字段和旧的 matched_pharmacist_id 字段
         const pharmacistId = queue.pharmacist_id || queue.matched_pharmacist_id
         if (pharmacistId) {
+          console.log('[App] Trying to find session by pharmacist_id:', pharmacistId)
           const { data: altData, error: altError } = await supabase
             .from('consultation_sessions')
             .select(`
@@ -314,27 +323,28 @@ function App() {
             .maybeSingle()
 
           if (altError && altError.code !== 'PGRST116') {
+            console.error('[App] Error querying session by pharmacist_id:', altError)
             throw altError
           }
 
           if (altData) {
+            console.log('[App] Session found by pharmacist_id:', altData.id)
             session = altData
             break
           }
         }
         
-        // 不再查找任何活跃会话，必须通过 queue_id 或 matched_pharmacist_id 匹配
-        // 这确保只有被药剂师明确接受的队列才能进入聊天
+        console.log('[App] Session not found yet, waiting before retry...')
 
         // 如果还没找到，等待一下再重试
         if (retries > 1) {
           await new Promise(resolve => setTimeout(resolve, 1000))
         }
       } catch (error) {
-        console.error(`Error loading matched session (retry ${6 - retries}):`, error)
+        console.error(`[App] Error loading matched session (retry ${6 - retries}):`, error)
         if (retries === 1) {
           // 最后一次重试失败，显示详细错误
-          console.error('Final error loading session:', error)
+          console.error('[App] Final error loading session:', error)
           alert(`Failed to load consultation session: ${error.message || 'Session not found. Please try again.'}`)
           return
         }
@@ -343,9 +353,11 @@ function App() {
     }
 
     if (session) {
+      console.log('[App] Session loaded successfully, navigating to chat:', session.id)
       setCurrentConsultationSession(session)
       setStep('consultation-patient')
     } else {
+      console.error('[App] Session not found after all retries')
       alert('Consultation session not found. Please try again or contact support.')
     }
   }
