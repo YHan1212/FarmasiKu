@@ -11,10 +11,11 @@ function PharmacistDashboard({ user, onBack }) {
   const [pharmacistId, setPharmacistId] = useState(null)
   const [isOnline, setIsOnline] = useState(false)
 
-  console.log('[PharmacistDashboard] Component rendered', {
+  console.log('🟢 [PharmacistDashboard] Component rendered', {
     userId: user?.id,
     hasUser: !!user,
-    loading: loading
+    loading: loading,
+    timestamp: new Date().toISOString()
   })
 
   useEffect(() => {

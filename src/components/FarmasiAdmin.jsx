@@ -782,8 +782,10 @@ function FarmasiAdmin({ user, onBack, onLogout }) {
         <button
           className={`tab ${activeTab === 'pharmacist' ? 'active' : ''}`}
           onClick={() => {
-            console.log('[FarmasiAdmin] Clicking Pharmacist Dashboard tab')
+            console.log('🔵 [FarmasiAdmin] Clicking Pharmacist Dashboard tab')
+            console.log('🔵 [FarmasiAdmin] Current activeTab:', activeTab)
             setActiveTab('pharmacist')
+            console.log('🔵 [FarmasiAdmin] activeTab set to: pharmacist')
           }}
         >
           💬 Pharmacist Dashboard
@@ -1097,7 +1099,7 @@ function FarmasiAdmin({ user, onBack, onLogout }) {
 
         {activeTab === 'pharmacist' && (
           <>
-            {console.log('[FarmasiAdmin] Rendering PharmacistDashboard, user:', user?.id)}
+            {console.log('🟢 [FarmasiAdmin] Rendering PharmacistDashboard, user:', user?.id, 'activeTab:', activeTab)}
             <PharmacistDashboard
               user={user}
               onBack={() => setActiveTab('dashboard')}
