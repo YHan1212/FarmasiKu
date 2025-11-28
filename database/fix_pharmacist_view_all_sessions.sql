@@ -20,7 +20,7 @@ CREATE POLICY "Users can view own sessions"
         -- 或者通过队列匹配的药剂师
         EXISTS (
           SELECT 1 FROM public.consultation_queue
-          WHERE consultation_queue.queue_id = consultation_sessions.queue_id
+          WHERE consultation_queue.id = consultation_sessions.queue_id
           AND consultation_queue.matched_pharmacist_id = doctors.id
         )
       )
@@ -43,7 +43,7 @@ CREATE POLICY "Users can update own sessions"
         (consultation_sessions.doctor_id IS NOT NULL AND doctors.id = consultation_sessions.doctor_id) OR
         EXISTS (
           SELECT 1 FROM public.consultation_queue
-          WHERE consultation_queue.queue_id = consultation_sessions.queue_id
+          WHERE consultation_queue.id = consultation_sessions.queue_id
           AND consultation_queue.matched_pharmacist_id = doctors.id
         )
       )
@@ -58,7 +58,7 @@ CREATE POLICY "Users can update own sessions"
         (consultation_sessions.doctor_id IS NOT NULL AND doctors.id = consultation_sessions.doctor_id) OR
         EXISTS (
           SELECT 1 FROM public.consultation_queue
-          WHERE consultation_queue.queue_id = consultation_sessions.queue_id
+          WHERE consultation_queue.id = consultation_sessions.queue_id
           AND consultation_queue.matched_pharmacist_id = doctors.id
         )
       )
@@ -86,7 +86,7 @@ CREATE POLICY "Users can view session messages"
             (consultation_sessions.doctor_id IS NOT NULL AND doctors.id = consultation_sessions.doctor_id) OR
             EXISTS (
               SELECT 1 FROM public.consultation_queue
-              WHERE consultation_queue.queue_id = consultation_sessions.queue_id
+              WHERE consultation_queue.id = consultation_sessions.queue_id
               AND consultation_queue.matched_pharmacist_id = doctors.id
             )
           )
@@ -116,7 +116,7 @@ CREATE POLICY "Users can send messages"
             (consultation_sessions.doctor_id IS NOT NULL AND doctors.id = consultation_sessions.doctor_id) OR
             EXISTS (
               SELECT 1 FROM public.consultation_queue
-              WHERE consultation_queue.queue_id = consultation_sessions.queue_id
+              WHERE consultation_queue.id = consultation_sessions.queue_id
               AND consultation_queue.matched_pharmacist_id = doctors.id
             )
           )
