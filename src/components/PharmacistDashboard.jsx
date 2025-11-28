@@ -120,7 +120,27 @@ function PharmacistDashboard({ user, onBack }) {
     try {
       setLoading(true)
 
-      // 加载等待中的队列（状态为 'waiting' 的队列，等待药剂师接受）
+      // 检查用户角色（用于调试）
+      let userRole = null
+      if (user?.id) {
+        const { data: userProfile } = await supabase
+          .from('user_profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single()
+        userRole = userProfile?.role
+        console.log('[PharmacistDashboard] User info:', { 
+          userId: user.id, 
+          role: userRole,
+          pharmacistId: pharmacistId
+        })
+      }
+
+      // 加载等待中的队列
+      // 注意：RLS 策略会自动处理权限
+      // - Admin 用户可以看到所有 waiting 队列
+      // - 普通用户只能看到自己的队列
+      // - 链接了 pharmacist account 的用户也可以看到 waiting 队列
       console.log('[PharmacistDashboard] Loading waiting queues...')
       const { data: queues, error: queueError } = await supabase
         .from('consultation_queue')
@@ -129,9 +149,11 @@ function PharmacistDashboard({ user, onBack }) {
         .order('created_at', { ascending: true })
 
       console.log('[PharmacistDashboard] Waiting queues result:', { 
-        queues, 
-        queueError,
-        count: queues?.length || 0 
+        queues: queues || [],
+        queueError: queueError,
+        count: queues?.length || 0,
+        userRole: userRole,
+        hasError: !!queueError
       })
 
       // 加载患者信息
@@ -165,8 +187,18 @@ function PharmacistDashboard({ user, onBack }) {
           details: queueError.details,
           hint: queueError.hint
         })
-        alert(`Failed to load waiting queues: ${queueError.message}\n\nPlease check:\n1. Are you logged in as admin?\n2. Is your role set to 'admin' in user_profiles?\n3. Run the SQL fix script: fix_admin_view_waiting_queues_v2.sql`)
+        alert(`Failed to load waiting queues: ${queueError.message}\n\nError Code: ${queueError.code}\n\nPlease check:\n1. Are you logged in as admin?\n2. Is your role set to 'admin' in user_profiles?\n3. Run the SQL script: rebuild_consultation_queue_rls.sql`)
         throw queueError
+      }
+
+      // 如果没有错误但也没有数据，可能是 RLS 策略阻止了
+      if (!queueError && (!queues || queues.length === 0)) {
+        console.warn('[PharmacistDashboard] No queues returned, but no error.', {
+          userRole: userRole,
+          userId: user?.id,
+          pharmacistId: pharmacistId,
+          note: 'This might be normal if you are not admin and have no own queues, or if there are no waiting queues.'
+        })
       }
 
       // 加载活跃的会话
