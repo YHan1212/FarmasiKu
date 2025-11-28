@@ -3,11 +3,31 @@ const { writeFileSync } = require('fs')
 const { resolve } = require('path')
 
 try {
-  // 获取 Git 信息
-  const gitCommitHash = execSync('git rev-parse HEAD', { encoding: 'utf-8' }).trim()
-  const gitCommitDate = execSync('git log -1 --format=%ci', { encoding: 'utf-8' }).trim()
-  const gitCommitMessage = execSync('git log -1 --format=%s', { encoding: 'utf-8' }).trim()
-  const gitBranch = execSync('git rev-parse --abbrev-ref HEAD', { encoding: 'utf-8' }).trim()
+  // 优先使用 Vercel 环境变量（如果可用）
+  let gitCommitHash = process.env.VERCEL_GIT_COMMIT_SHA || null
+  let gitCommitDate = null
+  let gitCommitMessage = process.env.VERCEL_GIT_COMMIT_MESSAGE || null
+  let gitBranch = process.env.VERCEL_GIT_COMMIT_REF || process.env.VERCEL_GIT_COMMIT_BRANCH || null
+
+  // 如果 Vercel 环境变量不可用，尝试从 Git 获取
+  if (!gitCommitHash) {
+    try {
+      gitCommitHash = execSync('git rev-parse HEAD', { encoding: 'utf-8' }).trim()
+      gitCommitDate = execSync('git log -1 --format=%ci', { encoding: 'utf-8' }).trim()
+      gitCommitMessage = gitCommitMessage || execSync('git log -1 --format=%s', { encoding: 'utf-8' }).trim()
+      gitBranch = gitBranch || execSync('git rev-parse --abbrev-ref HEAD', { encoding: 'utf-8' }).trim()
+    } catch (gitError) {
+      console.warn('⚠️ Git commands failed, using fallback:', gitError.message)
+      // 如果 Git 命令也失败，使用默认值
+      gitCommitHash = 'unknown'
+      gitCommitDate = new Date().toISOString()
+      gitCommitMessage = gitCommitMessage || 'Unknown'
+      gitBranch = gitBranch || 'unknown'
+    }
+  } else {
+    // 如果使用 Vercel 环境变量，设置提交日期为当前时间
+    gitCommitDate = new Date().toISOString()
+  }
   
   // 获取当前时间（构建时间）
   const buildTime = new Date().toISOString()
