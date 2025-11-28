@@ -1099,7 +1099,17 @@ function FarmasiAdmin({ user, onBack, onLogout }) {
 
         {activeTab === 'pharmacist' && (
           <>
-            {console.log('🟢 [FarmasiAdmin] Rendering PharmacistDashboard, user:', user?.id, 'activeTab:', activeTab)}
+            {(() => {
+              console.log('🟢 [FarmasiAdmin] ========== RENDERING PHARMACIST DASHBOARD ==========')
+              console.log('🟢 [FarmasiAdmin] Rendering PharmacistDashboard', {
+                userId: user?.id,
+                hasUser: !!user,
+                activeTab: activeTab,
+                timestamp: new Date().toISOString()
+              })
+              console.log('🟢 [FarmasiAdmin] =====================================================')
+              return null
+            })()}
             <PharmacistDashboard
               user={user}
               onBack={() => setActiveTab('dashboard')}

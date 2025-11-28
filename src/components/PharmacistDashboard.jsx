@@ -11,25 +11,42 @@ function PharmacistDashboard({ user, onBack }) {
   const [pharmacistId, setPharmacistId] = useState(null)
   const [isOnline, setIsOnline] = useState(false)
 
+  console.log('🟢 [PharmacistDashboard] ========== COMPONENT RENDERED ==========')
   console.log('🟢 [PharmacistDashboard] Component rendered', {
     userId: user?.id,
     hasUser: !!user,
     loading: loading,
     timestamp: new Date().toISOString()
   })
+  console.log('🟢 [PharmacistDashboard] ==========================================')
 
   useEffect(() => {
-    if (!user) return
+    console.log('[PharmacistDashboard] useEffect [user] triggered', {
+      hasUser: !!user,
+      userId: user?.id
+    })
+    if (!user) {
+      console.warn('[PharmacistDashboard] ⚠️ No user provided, skipping loadPharmacistInfo')
+      return
+    }
+    console.log('[PharmacistDashboard] Calling loadPharmacistInfo...')
     loadPharmacistInfo()
   }, [user])
 
   useEffect(() => {
+    console.log('[PharmacistDashboard] ========== useEffect [pharmacistId, user] TRIGGERED ==========')
     console.log('[PharmacistDashboard] useEffect triggered', {
       user: user?.id,
       pharmacistId: pharmacistId
     })
     
+    if (!user) {
+      console.warn('[PharmacistDashboard] ⚠️ No user, skipping loadData')
+      return
+    }
+    
     // 即使没有 pharmacistId，也加载数据（Admin 可以查看所有队列）
+    console.log('[PharmacistDashboard] Calling loadData()...')
     loadData()
     
     // Set up realtime subscriptions
@@ -133,23 +150,39 @@ function PharmacistDashboard({ user, onBack }) {
 
   const loadData = async () => {
     // 即使没有 pharmacistId，也加载数据（Admin 可以查看所有队列）
+    console.log('[PharmacistDashboard] ========== loadData() CALLED ==========')
+    console.log('[PharmacistDashboard] Starting loadData...', {
+      userId: user?.id,
+      pharmacistId: pharmacistId,
+      timestamp: new Date().toISOString()
+    })
+    
     try {
       setLoading(true)
+      console.log('[PharmacistDashboard] Loading state set to true')
 
       // 检查用户角色（用于调试）
       let userRole = null
       if (user?.id) {
-        const { data: userProfile } = await supabase
+        console.log('[PharmacistDashboard] Fetching user role...')
+        const { data: userProfile, error: roleError } = await supabase
           .from('user_profiles')
           .select('role')
           .eq('id', user.id)
           .single()
-        userRole = userProfile?.role
-        console.log('[PharmacistDashboard] User info:', { 
-          userId: user.id, 
-          role: userRole,
-          pharmacistId: pharmacistId
-        })
+        
+        if (roleError) {
+          console.error('[PharmacistDashboard] Error fetching user role:', roleError)
+        } else {
+          userRole = userProfile?.role
+          console.log('[PharmacistDashboard] User info:', { 
+            userId: user.id, 
+            role: userRole,
+            pharmacistId: pharmacistId
+          })
+        }
+      } else {
+        console.warn('[PharmacistDashboard] ⚠️ No user.id available')
       }
 
       // 加载等待中的队列
