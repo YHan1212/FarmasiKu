@@ -133,16 +133,6 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToForgotPassword }) {
           </p>
         </div>
 
-        <div className="login-divider">
-          <span>OR</span>
-        </div>
-
-        <button 
-          className="continue-guest-button"
-          onClick={() => onLogin(null)}
-        >
-          Continue as Guest
-        </button>
       </div>
       
       {/* Version info - displayed in bottom right corner */}

@@ -122,45 +122,6 @@
   color: #2563EB;
 }
 
-.login-divider {
-  display: flex;
-  align-items: center;
-  margin: 24px 0;
-  color: #999;
-  font-size: 14px;
-}
-
-.login-divider::before,
-.login-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: #e0e0e0;
-}
-
-.login-divider span {
-  padding: 0 16px;
-}
-
-.continue-guest-button {
-  width: 100%;
-  background: white;
-  color: #3B82F6;
-  border: 2px solid #3B82F6;
-  padding: 12px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.continue-guest-button:hover {
-  background: #EFF6FF;
-  border-color: #2563EB;
-  color: #2563EB;
-  transform: translateY(-2px);
-}
 
 /* Mobile optimization for phones */
 @media (max-width: 768px) {
@@ -194,11 +155,6 @@
     min-height: 48px;
   }
 
-  .continue-guest-button {
-    font-size: 16px; /* Prevents zoom on iOS */
-    min-height: 48px;
-    padding: 14px;
-  }
 }
 
 @media (max-width: 480px) {
@@ -230,11 +186,6 @@
     min-height: 44px;
   }
 
-  .continue-guest-button {
-    font-size: 16px; /* Prevents zoom on iOS */
-    min-height: 44px;
-    padding: 12px;
-  }
 
   .link-button {
     font-size: 13px;
