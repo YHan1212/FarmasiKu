@@ -947,7 +947,7 @@ function App() {
         ) : (
           <>
             {/* 普通用户：显示正常流程 */}
-            {step !== 'admin' && step !== 'profile' && step !== 'my-orders' && step !== 'consultation-list' && step !== 'welcome' && 
+            {step !== 'admin' && step !== 'profile' && step !== 'my-orders' && step !== 'order-tracking' && step !== 'consultation-list' && step !== 'welcome' && 
              step !== 'consultation-patient' && step !== 'consultation-doctor' && step !== 'consultation-waiting' && (
               <>
                 <ProgressIndicator 
