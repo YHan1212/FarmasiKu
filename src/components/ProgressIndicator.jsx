@@ -7,7 +7,6 @@ function ProgressIndicator({ currentStep, totalSteps, stepName }) {
   return (
     <div className="progress-indicator">
       <div className="progress-header">
-        <span className="step-info">Step {currentStep} of {totalSteps}</span>
         <span className="step-name">{stepName}</span>
       </div>
       <div className="progress-bar-container">

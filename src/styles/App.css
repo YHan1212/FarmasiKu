@@ -96,6 +96,29 @@
   background: #2563EB;
 }
 
+.my-orders-button {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
+.my-orders-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
 .profile-button {
   background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
   color: white;
@@ -179,6 +202,7 @@ input[type="submit"] {
 .consultation-patient-button-header,
 .consultation-doctor-button-header,
 .admin-button,
+.my-orders-button,
 .profile-button,
 .logout-button-header {
   display: inline-flex;
@@ -238,6 +262,12 @@ input[type="submit"] {
     font-size: 11px;
   }
 
+  .my-orders-button {
+    font-size: 11px;
+    padding: 8px 12px;
+    gap: 4px;
+  }
+
   .profile-button {
     max-width: 110px;
     font-size: 11px;
@@ -280,6 +310,7 @@ input[type="submit"] {
   .consultation-patient-button-header,
   .consultation-doctor-button-header,
   .admin-button,
+  .my-orders-button,
   .profile-button,
   .logout-button-header {
     font-size: 10px;

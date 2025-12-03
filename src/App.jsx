@@ -18,6 +18,7 @@ import ForgotPassword from './components/ForgotPassword'
 import ResetPassword from './components/ResetPassword'
 import Welcome from './components/Welcome'
 import Profile from './components/Profile'
+import MyOrders from './components/MyOrders'
 import FarmasiAdmin from './components/FarmasiAdmin'
 import SimpleChat from './components/SimpleChat'
 import ConsultationQueue from './components/ConsultationQueue'
@@ -31,7 +32,7 @@ import './styles/App.css'
 function App() {
   const [user, setUser] = useState(null)
   const [authStep, setAuthStep] = useState('login') // 'login', 'register', 'forgot-password', 'reset-password', 'authenticated'
-  const [step, setStep] = useState('welcome') // welcome, age, bodyPart, symptom, assessment, confirmation, medication, delivery, payment, consultation, consultation-list, success, profile, admin, consultation-waiting, realtime-consultation, consultation-review
+  const [step, setStep] = useState('welcome') // welcome, age, bodyPart, symptom, assessment, confirmation, medication, delivery, payment, consultation, consultation-list, success, profile, my-orders, admin, consultation-waiting, realtime-consultation, consultation-review
   const [userAge, setUserAge] = useState(null)
   const [selectedBodyPart, setSelectedBodyPart] = useState(null)
   const [selectedSymptoms, setSelectedSymptoms] = useState([])
@@ -226,6 +227,10 @@ function App() {
 
   const handleShowProfile = () => {
     setStep('profile')
+  }
+
+  const handleShowMyOrders = () => {
+    setStep('my-orders')
   }
 
   const handleShowAdmin = () => {
@@ -743,7 +748,7 @@ function App() {
 
   // Handle back navigation
   const handleBack = () => {
-    if (step === 'profile') {
+    if (step === 'profile' || step === 'my-orders') {
       setStep('welcome')
     } else if (step === 'age') {
       setStep('welcome')
@@ -903,6 +908,13 @@ function App() {
           <h1>farmasiKu</h1>
           <div className="user-menu">
             <button 
+              className="my-orders-button"
+              onClick={handleShowMyOrders}
+              title="My Orders"
+            >
+              📦 My Orders
+            </button>
+            <button 
               className="profile-button"
               onClick={handleShowProfile}
               title={`Profile: ${user.email}`}
@@ -935,7 +947,7 @@ function App() {
         ) : (
           <>
             {/* 普通用户：显示正常流程 */}
-            {step !== 'admin' && step !== 'profile' && step !== 'consultation-list' && step !== 'welcome' && 
+            {step !== 'admin' && step !== 'profile' && step !== 'my-orders' && step !== 'consultation-list' && step !== 'welcome' && 
              step !== 'consultation-patient' && step !== 'consultation-doctor' && step !== 'consultation-waiting' && (
               <>
                 <ProgressIndicator 
@@ -1087,6 +1099,17 @@ function App() {
             user={user}
             onLogout={handleLogout}
             onRestartFlow={handleRestartFlow}
+            onTrackOrder={(orderId) => {
+              setTrackingOrderId(orderId)
+              setStep('order-tracking')
+            }}
+          />
+        )}
+
+        {step === 'my-orders' && user && userRole !== 'admin' && (
+          <MyOrders
+            user={user}
+            onBack={() => setStep('welcome')}
             onTrackOrder={(orderId) => {
               setTrackingOrderId(orderId)
               setStep('order-tracking')
