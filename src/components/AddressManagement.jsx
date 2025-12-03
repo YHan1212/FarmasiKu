@@ -56,7 +56,7 @@ function AddressManagement({ user, onSelect, onContinue, selectedAddressId }) {
   }
 
   const validatePhoneNumber = (phone) => {
-    // 格式：01开头，后面8或9位数字
+    // Format: starts with 01, followed by 8 or 9 digits
     const phoneRegex = /^01\d{8,9}$/
     return phoneRegex.test(phone)
   }
@@ -70,15 +70,15 @@ function AddressManagement({ user, onSelect, onContinue, selectedAddressId }) {
       return
     }
 
-    // 验证必填字段
+    // Validate required fields
     if (!formData.label || !formData.address_line1 || !formData.phone_number) {
-      alert('请填写所有必填字段')
+      alert('Please fill in all required fields')
       return
     }
 
-    // 检查地址数量（最多4个）
+    // Check address count (max 4)
     if (!editingAddress && addresses.length >= 4) {
-      alert('最多只能保存4个地址')
+      alert('You can only save up to 4 addresses')
       return
     }
 
@@ -98,7 +98,7 @@ function AddressManagement({ user, onSelect, onContinue, selectedAddressId }) {
       }
 
       if (editingAddress) {
-        // 更新地址
+        // Update address
         const { error } = await supabase
           .from('user_addresses')
           .update(addressData)
@@ -106,7 +106,7 @@ function AddressManagement({ user, onSelect, onContinue, selectedAddressId }) {
 
         if (error) throw error
       } else {
-        // 添加新地址
+        // Add new address
         const { error } = await supabase
           .from('user_addresses')
           .insert([addressData])
@@ -114,7 +114,7 @@ function AddressManagement({ user, onSelect, onContinue, selectedAddressId }) {
         if (error) throw error
       }
 
-      // 重置表单
+      // Reset form
       setFormData({
         label: '',
         address_line1: '',
@@ -126,13 +126,17 @@ function AddressManagement({ user, onSelect, onContinue, selectedAddressId }) {
       })
       setShowAddForm(false)
       setEditingAddress(null)
+      // Show loading for at least 1.5 seconds
+      setLoading(true)
+      await new Promise(resolve => setTimeout(resolve, 1500))
       await loadAddresses()
     } catch (error) {
       console.error('Error saving address:', error)
+      setLoading(false)
       if (error.message.includes('Maximum 4 addresses')) {
-        alert('最多只能保存4个地址')
+        alert('You can only save up to 4 addresses')
       } else {
-        alert('保存地址失败：' + error.message)
+        alert('Failed to save address: ' + error.message)
       }
     }
   }
@@ -152,7 +156,7 @@ function AddressManagement({ user, onSelect, onContinue, selectedAddressId }) {
   }
 
   const handleDelete = async (addressId) => {
-    if (!confirm('确定要删除这个地址吗？')) return
+    if (!confirm('Are you sure you want to delete this address?')) return
 
     if (!supabase) return
 
@@ -163,10 +167,14 @@ function AddressManagement({ user, onSelect, onContinue, selectedAddressId }) {
         .eq('id', addressId)
 
       if (error) throw error
+      // Show loading for at least 1.5 seconds
+      setLoading(true)
+      await new Promise(resolve => setTimeout(resolve, 1500))
       await loadAddresses()
     } catch (error) {
       console.error('Error deleting address:', error)
-      alert('删除地址失败：' + error.message)
+      setLoading(false)
+      alert('Failed to delete address: ' + error.message)
     }
   }
 
@@ -174,23 +182,27 @@ function AddressManagement({ user, onSelect, onContinue, selectedAddressId }) {
     if (!supabase) return
 
     try {
-      // 先取消所有默认地址
+      // Clear all default addresses first
       await supabase
         .from('user_addresses')
         .update({ is_default: false })
         .eq('user_id', user.id)
 
-      // 设置新的默认地址
+      // Set new default address
       const { error } = await supabase
         .from('user_addresses')
         .update({ is_default: true })
         .eq('id', addressId)
 
       if (error) throw error
+      // Show loading for at least 1.5 seconds
+      setLoading(true)
+      await new Promise(resolve => setTimeout(resolve, 1500))
       await loadAddresses()
     } catch (error) {
       console.error('Error setting default address:', error)
-      alert('设置默认地址失败：' + error.message)
+      setLoading(false)
+      alert('Failed to set default address: ' + error.message)
     }
   }
 
@@ -201,7 +213,7 @@ function AddressManagement({ user, onSelect, onContinue, selectedAddressId }) {
   }
 
   if (loading) {
-    return <div className="loading">加载地址中...</div>
+    return <div className="loading">Loading addresses...</div>
   }
 
   // Check if this is in management mode (no onSelect callback)
@@ -211,7 +223,7 @@ function AddressManagement({ user, onSelect, onContinue, selectedAddressId }) {
     <div className="address-management">
       <h2>{isManagementMode ? 'Manage Addresses' : 'Select Delivery Address'}</h2>
 
-      {/* 地址列表 */}
+      {/* Address list */}
       <div className="addresses-list">
         {addresses.map((address) => (
           <div
@@ -222,7 +234,7 @@ function AddressManagement({ user, onSelect, onContinue, selectedAddressId }) {
             <div className="address-header">
               <div className="address-label-row">
                 <span className="address-label">{address.label}</span>
-                {address.is_default && <span className="default-badge">默认</span>}
+                {address.is_default && <span className="default-badge">Default</span>}
               </div>
               <div className="address-actions">
                 <button
@@ -232,7 +244,7 @@ function AddressManagement({ user, onSelect, onContinue, selectedAddressId }) {
                     handleEdit(address)
                   }}
                 >
-                  编辑
+                  Edit
                 </button>
                 <button
                   className="delete-btn"
@@ -241,7 +253,7 @@ function AddressManagement({ user, onSelect, onContinue, selectedAddressId }) {
                     handleDelete(address.id)
                   }}
                 >
-                  删除
+                  Delete
                 </button>
               </div>
             </div>
@@ -263,13 +275,13 @@ function AddressManagement({ user, onSelect, onContinue, selectedAddressId }) {
                   handleSetDefault(address.id)
                 }}
               >
-                设为默认
+                Set as Default
               </button>
             )}
           </div>
         ))}
 
-        {/* 添加新地址按钮 */}
+        {/* Add new address button */}
         {addresses.length < 4 && (
           <div
             className="add-address-card"
@@ -288,90 +300,90 @@ function AddressManagement({ user, onSelect, onContinue, selectedAddressId }) {
             }}
           >
             <div className="add-address-icon">+</div>
-            <p>添加新地址</p>
+            <p>Add New Address</p>
             <p className="address-count">({addresses.length}/4)</p>
           </div>
         )}
       </div>
 
-      {/* 添加/编辑地址表单 */}
+      {/* Add/Edit address form */}
       {showAddForm && (
         <div className="address-form-overlay">
           <div className="address-form-container">
-            <h3>{editingAddress ? '编辑地址' : '添加新地址'}</h3>
+            <h3>{editingAddress ? 'Edit Address' : 'Add New Address'}</h3>
             <form onSubmit={handleSubmit}>
               <div className="form-group">
-                <label>地址标签 *</label>
+                <label>Address Name *</label>
                 <input
                   type="text"
                   name="label"
                   value={formData.label}
                   onChange={handleInputChange}
-                  placeholder="例如：家、公司"
+                  placeholder="e.g., Home, Office"
                   required
                 />
               </div>
 
               <div className="form-group">
-                <label>详细地址 *</label>
+                <label>Street Address *</label>
                 <input
                   type="text"
                   name="address_line1"
                   value={formData.address_line1}
                   onChange={handleInputChange}
-                  placeholder="街道地址"
+                  placeholder="Street address"
                   required
                 />
               </div>
 
               <div className="form-group">
-                <label>地址第二行</label>
+                <label>Address Line 2</label>
                 <input
                   type="text"
                   name="address_line2"
                   value={formData.address_line2}
                   onChange={handleInputChange}
-                  placeholder="公寓、楼层等（可选）"
+                  placeholder="Apartment, floor, etc. (optional)"
                 />
               </div>
 
               <div className="form-row">
-                <div className="form-group">
-                  <label>邮政编码</label>
-                  <input
-                    type="text"
-                    name="postal_code"
-                    value={formData.postal_code}
-                    onChange={handleInputChange}
-                    placeholder="邮政编码"
-                  />
-                </div>
+              <div className="form-group">
+                <label>Postcode</label>
+                <input
+                  type="text"
+                  name="postal_code"
+                  value={formData.postal_code}
+                  onChange={handleInputChange}
+                  placeholder="Postcode"
+                />
+              </div>
 
                 <div className="form-group">
-                  <label>城市</label>
+                  <label>City</label>
                   <input
                     type="text"
                     name="city"
                     value={formData.city}
                     onChange={handleInputChange}
-                    placeholder="城市"
+                    placeholder="City"
                   />
                 </div>
               </div>
 
               <div className="form-group">
-                <label>州/省</label>
+                <label>State</label>
                 <input
                   type="text"
                   name="state"
                   value={formData.state}
                   onChange={handleInputChange}
-                  placeholder="州/省"
+                  placeholder="State"
                 />
               </div>
 
               <div className="form-group">
-                <label>电话号码 *</label>
+                <label>Phone Number *</label>
                 <input
                   type="tel"
                   name="phone_number"
@@ -389,10 +401,10 @@ function AddressManagement({ user, onSelect, onContinue, selectedAddressId }) {
                   setShowAddForm(false)
                   setEditingAddress(null)
                 }}>
-                  取消
+                  Cancel
                 </button>
                 <button type="submit" className="save-btn">
-                  {editingAddress ? '更新' : '保存'}
+                  {editingAddress ? 'Save Changes' : 'Save'}
                 </button>
               </div>
             </form>
@@ -400,11 +412,11 @@ function AddressManagement({ user, onSelect, onContinue, selectedAddressId }) {
         </div>
       )}
 
-      {/* 继续按钮 */}
+      {/* Continue button */}
       {onContinue && selectedAddressId && (
         <div className="continue-section">
           <button className="continue-btn" onClick={onContinue}>
-            继续
+            Continue
           </button>
         </div>
       )}

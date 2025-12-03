@@ -91,7 +91,7 @@ function ResetPassword({ onBack }) {
       <div className="reset-password-card">
         <h2>Reset Your Password</h2>
         <p className="reset-password-subtitle">
-          Enter your new password below
+          Enter your new password
         </p>
 
         {error && (
@@ -136,7 +136,7 @@ function ResetPassword({ onBack }) {
             className="reset-button"
             disabled={loading || !password || !confirmPassword}
           >
-            {loading ? 'Resetting...' : 'Reset Password'}
+            {loading ? 'Saving...' : 'Save New Password'}
           </button>
         </form>
       </div>

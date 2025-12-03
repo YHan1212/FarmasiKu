@@ -2,12 +2,12 @@ import React, { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import './Login.css'
 
-// 导入版本信息
+// Import version info
 import versionInfoRaw from '../version.json'
 
 const versionInfo = versionInfoRaw || {
-  commitDate: '未知',
-  buildTime: '未知'
+  commitDate: 'Unknown',
+  buildTime: 'Unknown'
 }
 
 function Login({ onLogin, onSwitchToRegister, onSwitchToForgotPassword }) {
@@ -51,11 +51,11 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToForgotPassword }) {
         onLogin(data.user)
       }
     } catch (error) {
-      if (error.message.includes('Invalid login credentials')) {
-        setError('Invalid email or password. Please check your credentials or use "Forgot password?" to reset.')
-      } else {
-        setError(error.message || 'Login failed. Please check your credentials.')
-      }
+        if (error.message.includes('Invalid login credentials')) {
+          setError('Invalid email or password. Please check your email and password or use "Forgot password?" to reset.')
+        } else {
+          setError(error.message || 'Login failed. Please check your email and password.')
+        }
     } finally {
       setLoading(false)
     }
@@ -65,7 +65,7 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToForgotPassword }) {
     <div className="login-container">
       <div className="login-card">
         <h2>Login to farmasiKu</h2>
-        <p className="login-subtitle">Access your orders and medication history</p>
+        <p className="login-subtitle">Access your orders and medicine history</p>
 
         {error && (
           <div className="error-message">
@@ -145,10 +145,10 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToForgotPassword }) {
         </button>
       </div>
       
-      {/* 版本信息 - 显示在右下角 */}
+      {/* Version info - displayed in bottom right corner */}
       <div className="version-info">
         <div className="version-text">
-          部署时间: {versionInfo?.buildTime || versionInfo?.commitDate || '未知'}
+          Build Time: {versionInfo?.buildTime || versionInfo?.commitDate || 'Unknown'}
         </div>
         {versionInfo?.commitHash && (
           <div className="version-hash">

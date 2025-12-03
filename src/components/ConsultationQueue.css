@@ -213,27 +213,86 @@
   transform: translateY(-1px);
 }
 
-/* Mobile Responsive */
+/* Mobile Responsive for phones */
 @media (max-width: 768px) {
+  .consultation-queue {
+    padding: 12px;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+
   .queue-container {
-    padding: 30px 20px;
+    padding: 24px 16px;
+    border-radius: 16px;
+    max-width: 100%;
+  }
+
+  .queue-header {
+    margin-bottom: 30px;
   }
 
   .queue-header h2 {
-    font-size: 24px;
+    font-size: 22px;
+  }
+
+  .waiting-subtitle {
+    font-size: 14px;
   }
 
   .queue-info {
     grid-template-columns: 1fr;
     gap: 12px;
+    margin-bottom: 30px;
   }
 
   .info-card {
     padding: 16px;
   }
 
+  .info-label {
+    font-size: 11px;
+  }
+
   .info-value {
     font-size: 20px;
+  }
+
+  .cancel-btn {
+    min-height: 48px;
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 14px 24px;
+  }
+
+  .waiting-message p {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .consultation-queue {
+    padding: 10px;
+  }
+
+  .queue-container {
+    padding: 20px 14px;
+  }
+
+  .queue-header h2 {
+    font-size: 20px;
+  }
+
+  .info-card {
+    padding: 14px;
+  }
+
+  .info-value {
+    font-size: 18px;
+  }
+
+  .cancel-btn {
+    min-height: 44px;
+    font-size: 15px;
+    padding: 12px 20px;
   }
 }
 

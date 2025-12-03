@@ -330,11 +330,14 @@ function FarmasiAdmin({ user, onBack, onLogout }) {
       setEditingMed(null)
       setEditPrice('')
       setEditStock('')
+      setLoading(true)
       await loadMedications()
-      
-      alert('Medication updated successfully!')
+      // Show loading for at least 1.5 seconds
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      setLoading(false)
     } catch (error) {
       console.error('Error updating medication:', error)
+      setLoading(false)
       alert(`Failed to update medication: ${error.message || 'Unknown error'}. Please check the console for details.`)
     }
   }
@@ -436,10 +439,14 @@ function FarmasiAdmin({ user, onBack, onLogout }) {
 
       setShowAddDoctor(false)
       setDoctorForm({ name: '', specialization: '', bio: '', is_available: true })
+      setLoading(true)
       await loadDoctors()
-      alert('Pharmacist added successfully!')
+      // Show loading for at least 1.5 seconds
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      setLoading(false)
     } catch (error) {
       console.error('Error adding doctor:', error)
+      setLoading(false)
       alert(`Failed to add pharmacist: ${error.message || 'Unknown error'}`)
     }
   }
@@ -476,10 +483,14 @@ function FarmasiAdmin({ user, onBack, onLogout }) {
 
       setEditingDoctor(null)
       setDoctorForm({ name: '', specialization: '', bio: '', is_available: true })
+      setLoading(true)
       await loadDoctors()
-      alert('Pharmacist updated successfully!')
+      // Show loading for at least 1.5 seconds
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      setLoading(false)
     } catch (error) {
       console.error('Error updating doctor:', error)
+      setLoading(false)
       alert(`Failed to update pharmacist: ${error.message || 'Unknown error'}`)
     }
   }
@@ -497,10 +508,14 @@ function FarmasiAdmin({ user, onBack, onLogout }) {
 
       if (error) throw error
 
+      setLoading(true)
       await loadDoctors()
-      alert('Pharmacist deleted successfully!')
+      // Show loading for at least 1.5 seconds
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      setLoading(false)
     } catch (error) {
       console.error('Error deleting doctor:', error)
+      setLoading(false)
       alert(`Failed to delete pharmacist: ${error.message || 'Unknown error'}`)
     }
   }
@@ -558,10 +573,14 @@ function FarmasiAdmin({ user, onBack, onLogout }) {
 
       if (error) throw error
 
+      setLoading(true)
       await loadDoctors()
-      alert('Pharmacist account linked successfully! You can now reply to consultations as this pharmacist.')
+      // Show loading for at least 1.5 seconds
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      setLoading(false)
     } catch (error) {
       console.error('Error linking doctor to user:', error)
+      setLoading(false)
       alert(`Failed to link pharmacist: ${error.message || 'Unknown error'}`)
     }
   }
@@ -582,10 +601,14 @@ function FarmasiAdmin({ user, onBack, onLogout }) {
 
       if (error) throw error
 
+      setLoading(true)
       await loadDoctors()
-      alert('Pharmacist account unlinked successfully!')
+      // Show loading for at least 1.5 seconds
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      setLoading(false)
     } catch (error) {
       console.error('Error unlinking doctor from user:', error)
+      setLoading(false)
       alert(`Failed to unlink pharmacist: ${error.message || 'Unknown error'}`)
     }
   }
@@ -606,10 +629,14 @@ function FarmasiAdmin({ user, onBack, onLogout }) {
       if (error) throw error
 
       // Reload users to reflect the change
+      setLoading(true)
       await loadUsers()
-      alert(`User role updated to ${newRole} successfully!`)
+      // Show loading for at least 1.5 seconds
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      setLoading(false)
     } catch (error) {
       console.error('Error updating user role:', error)
+      setLoading(false)
       alert(`Failed to update user role: ${error.message || 'Unknown error'}`)
     }
   }
@@ -631,11 +658,14 @@ function FarmasiAdmin({ user, onBack, onLogout }) {
       setAcceptingOrder(null)
       
       // Reload orders
+      setLoading(true)
       await loadOrders()
-      
-      alert('Order accepted successfully!')
+      // Show loading for at least 1.5 seconds
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      setLoading(false)
     } catch (error) {
       console.error('Error accepting order:', error)
+      setLoading(false)
       alert(`Failed to accept order: ${error.message || 'Unknown error'}`)
     }
   }
@@ -662,11 +692,14 @@ function FarmasiAdmin({ user, onBack, onLogout }) {
       if (error) throw error
 
       // Reload orders
+      setLoading(true)
       await loadOrders()
-      
-      alert(`Order status updated to ${status} successfully!`)
+      // Show loading for at least 1.5 seconds
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      setLoading(false)
     } catch (error) {
       console.error('Error updating order status:', error)
+      setLoading(false)
       alert(`Failed to update order status: ${error.message || 'Unknown error'}`)
     }
   }

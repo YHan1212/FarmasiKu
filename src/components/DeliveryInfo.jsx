@@ -12,7 +12,7 @@ function DeliveryInfo({ user, onContinue, onBack }) {
 
   const handleContinue = () => {
     if (!selectedAddress) {
-      alert('请选择一个配送地址')
+      alert('Please select a delivery address')
       return
     }
     if (onContinue) {
@@ -35,8 +35,8 @@ function DeliveryInfo({ user, onContinue, onBack }) {
   return (
     <div className="delivery-info">
       <div className="delivery-info-header">
-        <h2>配送信息</h2>
-        <p className="subtitle">请选择配送地址和电话号码</p>
+        <h2>Delivery Address</h2>
+        <p className="subtitle">Please select your delivery address and phone number</p>
       </div>
 
       <div className="delivery-content">
@@ -50,7 +50,7 @@ function DeliveryInfo({ user, onContinue, onBack }) {
       <div className="delivery-actions">
         {onBack && (
           <button className="back-btn" onClick={onBack}>
-            返回
+            Back
           </button>
         )}
         <button
@@ -58,7 +58,7 @@ function DeliveryInfo({ user, onContinue, onBack }) {
           onClick={handleContinue}
           disabled={!selectedAddress}
         >
-          继续到支付
+          Continue to Payment
         </button>
       </div>
     </div>

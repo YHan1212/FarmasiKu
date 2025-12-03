@@ -456,7 +456,7 @@ function PharmacistDashboard({ user, onBack }) {
             setPharmacistId(newDoctor.id)
             await setOnlineStatus(newDoctor.id, true)
           } else {
-            throw new Error(`无法创建医生记录: ${createError?.message || '未知错误'}`)
+            throw new Error(`Failed to create doctor record: ${createError?.message || 'Unknown error'}`)
           }
         } else if (userRole === 'admin') {
           // Admin 可以接受队列，尝试查找或创建 doctor 记录（用于会话管理）
@@ -487,11 +487,11 @@ function PharmacistDashboard({ user, onBack }) {
               setPharmacistId(newDoctor.id)
               await setOnlineStatus(newDoctor.id, true)
             } else {
-              throw new Error(`无法创建医生记录: ${createError?.message || '未知错误'}`)
+              throw new Error(`Failed to create doctor record: ${createError?.message || 'Unknown error'}`)
             }
           }
         } else {
-          throw new Error('请先在 Admin 面板中链接药剂师账户以接受咨询。')
+          throw new Error('Please link a pharmacist account in the Admin panel first to accept consultations.')
         }
       }
 
@@ -647,7 +647,7 @@ function PharmacistDashboard({ user, onBack }) {
   return (
     <div className="pharmacist-dashboard">
       <div className="pharmacist-header">
-        <h2>👨‍⚕️ Pharmacist Dashboard</h2>
+        <h2>👨‍⚕️ Doctor Dashboard</h2>
         <div className="online-status">
           <label>
             <input
@@ -673,9 +673,9 @@ function PharmacistDashboard({ user, onBack }) {
         <div className="loading">Loading...</div>
       ) : (
         <div className="pharmacist-content">
-          {/* 等待中的咨询 */}
+          {/* Waiting consultations */}
           <div className="section">
-            <h3>⏳ Waiting Consultations ({waitingQueues.length})</h3>
+            <h3>⏳ New Requests ({waitingQueues.length})</h3>
             {console.log('[PharmacistDashboard] Rendering waiting queues section', {
               waitingQueuesLength: waitingQueues.length,
               waitingQueues: waitingQueues
@@ -725,7 +725,7 @@ function PharmacistDashboard({ user, onBack }) {
                         </button>
                       ) : (
                         <div className="link-required-message">
-                          <p>⚠️ Please link a pharmacist account in Admin panel to accept consultations</p>
+                          <p>⚠️ Please link a doctor account in Admin panel to accept consultations</p>
                         </div>
                       )}
                     </div>
@@ -735,11 +735,11 @@ function PharmacistDashboard({ user, onBack }) {
             )}
           </div>
 
-          {/* 活跃的会话 */}
+          {/* Active chats */}
           <div className="section">
-            <h3>💬 Active Sessions ({activeSessions.length})</h3>
+            <h3>💬 Active Chats ({activeSessions.length})</h3>
             {activeSessions.length === 0 ? (
-              <div className="empty-state">No active sessions</div>
+              <div className="empty-state">No active chats</div>
             ) : (
               <div className="sessions-list">
                 {activeSessions.map((session) => (

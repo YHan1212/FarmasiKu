@@ -110,7 +110,7 @@ function SymptomSelection({
     <div className="symptom-selection">
       <div className="question-container">
         <h2 className="question-title">{bodyPart} Symptoms</h2>
-        <p className="question-subtitle">Please select the symptoms you are experiencing (multiple selections allowed)</p>
+        <p className="question-subtitle">Please select the symptoms you have (you can select more than one)</p>
       </div>
 
       <div className="symptoms-list">
@@ -152,7 +152,7 @@ function SymptomSelection({
                 </button>
                 {isSelected && hasAssessment && !isExpanded && (
                   <span className="assessed-badge">
-                    ✓ Assessed
+                    ✓ Done
                   </span>
                 )}
               </div>
@@ -161,13 +161,13 @@ function SymptomSelection({
               {isSelected && isExpanded && (
                 <div className="inline-assessment-panel">
                   <div className="assessment-header">
-                    <h3>Assess: {symptom}</h3>
+                    <h3>Describe: {symptom}</h3>
                   </div>
                   
                   <div className="assessment-content">
                     {/* Intensity */}
                     <div className="assessment-field">
-                      <label>Severity (1-10): <strong>{currentData.intensity}</strong></label>
+                      <label>Severity Level (1-10): <strong>{currentData.intensity}</strong></label>
                       <input
                         type="range"
                         min="1"
@@ -235,7 +235,7 @@ function SymptomSelection({
                       className="save-assessment-btn"
                       onClick={() => handleSaveAssessment(symptom)}
                     >
-                      ✓ Save Assessment
+                      ✓ Save
                     </button>
                   </div>
                 </div>
@@ -277,7 +277,7 @@ function SymptomSelection({
           </div>
           {selectedSymptoms.some(s => !symptomAssessments || !symptomAssessments[s]) && (
             <p className="assessment-note">
-              ⚠️ Please assess all selected symptoms for better recommendations
+              ⚠️ Please describe all selected symptoms for better recommendations
             </p>
           )}
         </div>
@@ -295,7 +295,7 @@ function SymptomSelection({
           onClick={onComplete}
           disabled={selectedSymptoms.length === 0}
         >
-          Complete Selection
+          Continue
         </button>
       </div>
     </div>

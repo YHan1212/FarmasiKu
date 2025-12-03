@@ -5,8 +5,8 @@ function SymptomConfirmation({ symptoms, symptomAssessments, onConfirm }) {
   return (
     <div className="symptom-confirmation">
       <div className="question-container">
-        <h2 className="question-title">Confirm Your Symptoms</h2>
-        <p className="question-subtitle">Please confirm if the following symptoms match your current condition</p>
+        <h2 className="question-title">Review Your Symptoms</h2>
+        <p className="question-subtitle">Please review if the following symptoms match your condition</p>
       </div>
 
       <div className="symptoms-list">
@@ -20,7 +20,7 @@ function SymptomConfirmation({ symptoms, symptomAssessments, onConfirm }) {
                 {assessment && (
                   <div className="symptom-assessment-info">
                     <span className="assessment-badge">
-                      Intensity: {assessment.intensity}/10 | 
+                      Severity: {assessment.intensity}/10 | 
                       Duration: {assessment.duration} | 
                       Frequency: {assessment.frequency}
                     </span>
@@ -33,7 +33,7 @@ function SymptomConfirmation({ symptoms, symptomAssessments, onConfirm }) {
       </div>
 
       <div className="confirmation-question">
-        <p className="question-text">Is this your current state or more severe?</p>
+        <p className="question-text">Does this match your current condition, or is it more severe?</p>
       </div>
 
       <div className="action-buttons">
@@ -41,7 +41,7 @@ function SymptomConfirmation({ symptoms, symptomAssessments, onConfirm }) {
           className="primary-button"
           onClick={() => onConfirm(false)}
         >
-          Current State
+          Matches My Condition
         </button>
         <button
           className="warning-button"

@@ -217,22 +217,101 @@
   transform: scale(0.98);
 }
 
-@media (max-width: 480px) {
+/* Mobile responsive for phones */
+@media (max-width: 768px) {
+  .symptom-assessment {
+    padding: 12px;
+    max-width: 100%;
+  }
+
+  .question-title {
+    font-size: 1.5rem;
+  }
+
+  .question-subtitle {
+    font-size: 0.9rem;
+  }
+
   .assessment-form {
     padding: 1.25rem;
+  }
+
+  .intensity-slider {
+    height: 10px;
+  }
+
+  .intensity-slider::-webkit-slider-thumb {
+    width: 28px;
+    height: 28px;
+  }
+
+  .duration-number,
+  .duration-unit {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 12px;
+  }
+
+  .frequency-button {
+    min-height: 44px;
+    font-size: 14px;
+  }
+
+  .primary-button,
+  .secondary-button {
+    min-height: 48px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
+@media (max-width: 480px) {
+  .symptom-assessment {
+    padding: 10px;
+  }
+
+  .question-title {
+    font-size: 1.3rem;
+  }
+
+  .assessment-form {
+    padding: 1rem;
   }
   
   .frequency-options {
     flex-direction: column;
+    gap: 10px;
+  }
+
+  .frequency-button {
+    width: 100%;
+    min-height: 44px;
   }
   
   .duration-input {
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
+  }
+
+  .duration-number {
+    width: 100%;
+    font-size: 16px; /* Prevents zoom on iOS */
   }
   
   .duration-unit {
     width: 100%;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .primary-button,
+  .secondary-button {
+    width: 100%;
+    min-height: 48px;
+    font-size: 16px; /* Prevents zoom on iOS */
   }
 }
 

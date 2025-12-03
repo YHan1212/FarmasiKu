@@ -86,7 +86,7 @@ function Register({ onRegister, onSwitchToLogin }) {
               
               if (retryError && retryError.code !== '23505') {
                 console.error('Retry also failed:', retryError)
-                setError(`Registration successful, but profile creation failed: ${retryError.message}. Please contact support.`)
+                setError(`Registration successful, but profile creation failed: ${retryError.message}. Please contact us for help.`)
               }
             }
           }
@@ -95,7 +95,7 @@ function Register({ onRegister, onSwitchToLogin }) {
         // Check if email confirmation is required
         if (data.user.email_confirmed_at === null) {
           // Email confirmation required - show message but don't block
-          setError('Registration successful! Please check your email and click the confirmation link. You can still use the app.')
+          setError('Registration successful! Please check your email and click the link. You can still use the app.')
           // Continue anyway - user can use app but should verify email
         }
 
@@ -112,7 +112,7 @@ function Register({ onRegister, onSwitchToLogin }) {
     <div className="register-container">
       <div className="register-card">
         <h2>Create Account</h2>
-        <p className="register-subtitle">Join farmasiKu to track your orders</p>
+        <p className="register-subtitle">Join farmasiKu to see your orders</p>
 
         {error && (
           <div className="error-message">
@@ -181,7 +181,7 @@ function Register({ onRegister, onSwitchToLogin }) {
             className="register-button"
             disabled={loading}
           >
-            {loading ? 'Creating account...' : 'Sign Up'}
+            {loading ? 'Creating...' : 'Sign Up'}
           </button>
         </form>
 

@@ -72,19 +72,44 @@
   box-shadow: none;
 }
 
-/* 移动端响应式 */
+/* Mobile responsive for phones */
 @media (max-width: 768px) {
   .delivery-info {
-    padding: 16px;
+    padding: 12px;
+    max-width: 100%;
+  }
+
+  .delivery-info-header h2 {
+    font-size: 22px;
   }
 
   .delivery-actions {
     flex-direction: column;
+    gap: 10px;
   }
 
   .back-btn,
   .continue-btn {
     width: 100%;
+    min-height: 48px;
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 14px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .delivery-info {
+    padding: 10px;
+  }
+
+  .delivery-info-header h2 {
+    font-size: 20px;
+  }
+
+  .back-btn,
+  .continue-btn {
+    min-height: 44px;
+    font-size: 15px;
   }
 }
 

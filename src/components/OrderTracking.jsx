@@ -245,10 +245,14 @@ function OrderTracking({ orderId, user, onBack }) {
       if (error) throw error
 
       // Reload order details
+      setLoading(true)
       await loadOrderDetails()
-      alert('Delivery confirmed! Thank you for your order.')
+      // Show loading for at least 1.5 seconds
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      setLoading(false)
     } catch (error) {
       console.error('Error confirming delivery:', error)
+      setLoading(false)
       alert('Failed to confirm delivery. Please try again.')
     }
   }

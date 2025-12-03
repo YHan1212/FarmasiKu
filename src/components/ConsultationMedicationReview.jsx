@@ -88,7 +88,7 @@ function ConsultationMedicationReview({ sessionId, user, onContinue, onBack }) {
         hint: error.hint,
         sessionId
       })
-      alert(`Failed to load medications: ${error.message || 'Unknown error'}. Please check the console for details.`)
+      alert(`Failed to load medicines: ${error.message || 'Unknown error'}. Please try again.`)
       // 即使出错，也设置空数组，避免无限加载
       setAcceptedMedications([])
       setTotalPrice(0)
@@ -116,7 +116,7 @@ function ConsultationMedicationReview({ sessionId, user, onContinue, onBack }) {
   if (loading) {
     return (
       <div className="consultation-medication-review">
-        <div className="loading">Loading medications...</div>
+        <div className="loading">Loading medicines...</div>
       </div>
     )
   }
@@ -129,7 +129,7 @@ function ConsultationMedicationReview({ sessionId, user, onContinue, onBack }) {
           <button className="back-btn" onClick={onBack}>← Back</button>
         </div>
         <div className="no-medications">
-          <p>No medications were accepted during this consultation.</p>
+          <p>No medicines were accepted during this consultation.</p>
           <button className="continue-btn" onClick={onBack}>
             Return to Home
           </button>
@@ -141,8 +141,8 @@ function ConsultationMedicationReview({ sessionId, user, onContinue, onBack }) {
   return (
     <div className="consultation-medication-review">
       <div className="review-header">
-        <h2>💊 Review Your Medications</h2>
-        <p className="subtitle">Please review the medications recommended by your pharmacist</p>
+        <h2>💊 Review Your Medicines</h2>
+        <p className="subtitle">Please review the medicines recommended by your doctor</p>
       </div>
 
       <div className="medications-list">

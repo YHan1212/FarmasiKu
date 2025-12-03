@@ -396,9 +396,13 @@ function SimpleChat({ user, onBack, sessionId, isDoctor, otherUserInfo, onMedica
         })
       }
       
-      alert('Medication accepted and added to cart!')
+      // Show loading for at least 1.5 seconds
+      setSending(true)
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      setSending(false)
     } catch (error) {
       console.error(`[SimpleChat-${isDoctor ? 'Doctor' : 'Patient'}] Error accepting medication:`, error)
+      setSending(false)
       alert(`Failed to accept medication: ${error.message}`)
     }
   }
@@ -406,14 +410,18 @@ function SimpleChat({ user, onBack, sessionId, isDoctor, otherUserInfo, onMedica
   const handleRejectMedication = async (medicationId, notes) => {
     try {
       console.log(`[SimpleChat-${isDoctor ? 'Doctor' : 'Patient'}] Rejecting medication:`, medicationId, notes)
+      setSending(true)
       await consultationService.rejectMedication(medicationId, notes)
       // 重新加载药物列表和消息
       await loadRecommendedMedications()
       await loadMessages()
-      alert('Medication rejected')
+      // Show loading for at least 1.5 seconds
+      await new Promise(resolve => setTimeout(resolve, 1500))
     } catch (error) {
       console.error(`[SimpleChat-${isDoctor ? 'Doctor' : 'Patient'}] Error rejecting medication:`, error)
       alert(`Failed to reject medication: ${error.message}`)
+    } finally {
+      setSending(false)
     }
   }
 
@@ -445,11 +453,15 @@ function SimpleChat({ user, onBack, sessionId, isDoctor, otherUserInfo, onMedica
         if (onConsultationComplete && typeof onConsultationComplete === 'function') {
           console.log('[SimpleChat] Calling onConsultationComplete callback')
           try {
+            // Show loading for at least 1.5 seconds
+            setSending(true)
+            await new Promise(resolve => setTimeout(resolve, 1500))
             onConsultationComplete()
             return
           } catch (error) {
             console.error('[SimpleChat] Error calling onConsultationComplete:', error)
-            alert('Error completing consultation: ' + error.message)
+            setSending(false)
+            alert('Error finishing consultation: ' + error.message)
             return
           }
         } else {
@@ -482,12 +494,15 @@ function SimpleChat({ user, onBack, sessionId, isDoctor, otherUserInfo, onMedica
         await consultationService.endConsultation(sessionId, session.queue_id)
       }
 
-      alert('Consultation ended')
+      // Show loading for at least 1.5 seconds before redirecting
+      setSending(true)
+      await new Promise(resolve => setTimeout(resolve, 1500))
       if (onBack) {
         onBack()
       }
     } catch (error) {
       console.error('Error ending consultation:', error)
+      setSending(false)
       alert(`Failed to end consultation: ${error.message}`)
     }
   }
@@ -550,7 +565,7 @@ function SimpleChat({ user, onBack, sessionId, isDoctor, otherUserInfo, onMedica
 
       if (error) {
         console.error('[SimpleChat] Error sending message:', error)
-        alert(`Failed to send message: ${error.message || 'Please check console for details.'}`)
+        alert(`Failed to send message: ${error.message || 'Please try again.'}`)
         return
       }
 
@@ -618,7 +633,7 @@ function SimpleChat({ user, onBack, sessionId, isDoctor, otherUserInfo, onMedica
           <h3>
             {isDoctor 
               ? `Patient: ${otherUserInfo?.name || otherUserInfo?.email || 'Patient'}`
-              : `Pharmacist: ${pharmacistInfo?.name || otherUserInfo?.name || session?.doctor?.name || 'Pharmacist'}`
+              : `Doctor: ${pharmacistInfo?.name || otherUserInfo?.name || session?.doctor?.name || 'Doctor'}`
             }
           </h3>
         </div>
@@ -671,7 +686,7 @@ function SimpleChat({ user, onBack, sessionId, isDoctor, otherUserInfo, onMedica
                     >
                       <div className="message-content">
                         <span className="message-sender">
-                          {messageSenderType === 'doctor' ? '👨‍⚕️ Pharmacist' : '👤 Patient'}
+                          {messageSenderType === 'doctor' ? '👨‍⚕️ Doctor' : '👤 Patient'}
                         </span>
                         <MedicationRecommendationCard
                           medication={medication}
@@ -693,9 +708,9 @@ function SimpleChat({ user, onBack, sessionId, isDoctor, otherUserInfo, onMedica
                     >
                       <div className="message-content">
                         <span className="message-sender">
-                          {messageSenderType === 'doctor' ? '👨‍⚕️ Pharmacist' : '👤 Patient'}
+                          {messageSenderType === 'doctor' ? '👨‍⚕️ Doctor' : '👤 Patient'}
                         </span>
-                        <p>💊 Medication Recommendation: {medicationData.medication_name || 'Loading...'}</p>
+                        <p>💊 Medicine Recommendation: {medicationData.medication_name || 'Loading...'}</p>
                         <span className="message-time">{formatTime(message.created_at)}</span>
                       </div>
                     </div>
@@ -714,8 +729,8 @@ function SimpleChat({ user, onBack, sessionId, isDoctor, otherUserInfo, onMedica
                 <div className="message-content">
                   <span className="message-sender">
                     {isFromCurrentUser 
-                      ? (messageSenderType === 'doctor' ? '👨‍⚕️ You (Pharmacist)' : '👤 You (Patient)')
-                      : (messageSenderType === 'doctor' ? '👨‍⚕️ Pharmacist' : '👤 Patient')
+                      ? (messageSenderType === 'doctor' ? '👨‍⚕️ You (Doctor)' : '👤 You (Patient)')
+                      : (messageSenderType === 'doctor' ? '👨‍⚕️ Doctor' : '👤 Patient')
                     }
                   </span>
                   <p>{message.content}</p>
@@ -734,7 +749,7 @@ function SimpleChat({ user, onBack, sessionId, isDoctor, otherUserInfo, onMedica
             className="recommend-medication-btn"
             onClick={() => setShowRecommendForm(true)}
           >
-            💊 Recommend Medication
+            💊 Recommend Medicine
           </button>
         )}
         <button
@@ -747,8 +762,8 @@ function SimpleChat({ user, onBack, sessionId, isDoctor, otherUserInfo, onMedica
           }}
         >
           {!isDoctor && recommendedMedications.some(m => m.status === 'accepted')
-            ? '✓ Complete Consultation & Review Medications'
-            : 'End Consultation'}
+            ? '✓ Finish & Review Medicines'
+            : 'End Chat'}
         </button>
       </div>
 

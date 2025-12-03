@@ -337,18 +337,63 @@
   color: #666;
 }
 
-@media (max-width: 480px) {
+/* Mobile responsive for phones */
+@media (max-width: 768px) {
+  .medication-recommendation {
+    padding: 12px;
+    max-width: 100%;
+  }
+
   .question-title {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
+  }
+
+  .question-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .medication-card {
+    padding: 1.25rem;
+  }
+
+  .proceed-button {
+    min-height: 48px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
+@media (max-width: 480px) {
+  .medication-recommendation {
+    padding: 10px;
+  }
+
+  .question-title {
+    font-size: 1.4rem;
   }
   
   .medication-card {
-    padding: 1.25rem;
+    padding: 1rem;
   }
   
   .medication-info {
     flex-direction: column;
     align-items: flex-start;
+    gap: 10px;
+  }
+
+  .medication-name {
+    font-size: 16px;
+  }
+
+  .proceed-button {
+    width: 100%;
+    min-height: 48px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .selection-summary {
+    flex-direction: column;
+    gap: 12px;
   }
 }
 

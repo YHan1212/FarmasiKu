@@ -8,7 +8,7 @@ function Welcome({ onStart }) {
         <div className="welcome-header">
           <div className="welcome-logo">🏥</div>
           <h1>Welcome to farmasiKu</h1>
-          <p className="welcome-subtitle">Your trusted online pharmacy companion</p>
+          <p className="welcome-subtitle">Your trusted online pharmacy</p>
         </div>
 
         <div className="welcome-actions-top">
@@ -20,20 +20,20 @@ function Welcome({ onStart }) {
         <div className="welcome-features">
           <div className="feature-card">
             <div className="feature-icon">🔍</div>
-            <h3>Symptom Assessment</h3>
-            <p>Describe your symptoms and get personalized medication recommendations based on your age and condition.</p>
+            <h3>Symptom Check</h3>
+            <p>Tell us your symptoms and get medicine suggestions based on your age and condition.</p>
           </div>
 
           <div className="feature-card">
             <div className="feature-icon">💊</div>
-            <h3>Medication Recommendations</h3>
-            <p>Receive safe and appropriate medication suggestions tailored to your specific needs.</p>
+            <h3>Medicine Suggestions</h3>
+            <p>Get safe and right medicine suggestions for your needs.</p>
           </div>
 
           <div className="feature-card">
             <div className="feature-icon">👨‍⚕️</div>
-            <h3>Pharmacist Consultation</h3>
-            <p>Chat with licensed pharmacists for professional medication advice and guidance.</p>
+            <h3>Doctor Chat</h3>
+            <p>Chat with doctors for professional medicine advice and help.</p>
           </div>
 
           <div className="feature-card">
@@ -48,20 +48,20 @@ function Welcome({ onStart }) {
             <h3>How It Works</h3>
             <ol className="steps-list">
               <li>Enter your age and select your symptoms</li>
-              <li>Complete a quick assessment</li>
-              <li>Review recommended medications</li>
-              <li>Consult with a doctor if needed</li>
-              <li>Order and get delivered to your home</li>
+              <li>Complete a quick check</li>
+              <li>Review suggested medicines</li>
+              <li>Chat with a doctor if needed</li>
+              <li>Order and get it delivered to your home</li>
             </ol>
           </div>
 
           <div className="info-section">
             <h3>Important Notes</h3>
             <ul className="notes-list">
-              <li>⚠️ This app provides recommendations only and does not replace professional medical advice</li>
-              <li>📋 Always consult with a healthcare professional for serious conditions</li>
-              <li>💊 Follow medication instructions carefully</li>
-              <li>🔒 Your health information is kept private and secure</li>
+              <li>⚠️ This app gives suggestions only and does not replace doctor advice</li>
+              <li>📋 Always see a doctor for serious health problems</li>
+              <li>💊 Follow medicine instructions carefully</li>
+              <li>🔒 Your health information is kept safe and private</li>
             </ul>
           </div>
         </div>

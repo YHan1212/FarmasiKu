@@ -269,7 +269,7 @@ function ConsultationQueue({ user, onEnterChat, onCancel, symptoms, symptomAsses
       <div className="consultation-queue">
         <div className="queue-loading">
           <div className="spinner"></div>
-          <p>正在加入队列...</p>
+          <p>Joining queue...</p>
         </div>
       </div>
     )
@@ -279,8 +279,8 @@ function ConsultationQueue({ user, onEnterChat, onCancel, symptoms, symptomAsses
     return (
       <div className="consultation-queue">
         <div className="queue-error">
-          <p>无法创建队列，请重试</p>
-          <button onClick={initializeQueue}>重试</button>
+          <p>Failed to create queue. Please try again</p>
+          <button onClick={initializeQueue}>Retry</button>
         </div>
       </div>
     )
@@ -291,27 +291,27 @@ function ConsultationQueue({ user, onEnterChat, onCancel, symptoms, symptomAsses
       <div className="queue-container">
         <div className="queue-header">
           <div className="waiting-icon">⏳</div>
-          <h2>Waiting for Pharmacist</h2>
-          <p className="waiting-subtitle">A pharmacist will review your request and accept your consultation</p>
+          <h2>Waiting for Doctor</h2>
+          <p className="waiting-subtitle">A doctor will review your request and start the chat</p>
         </div>
 
         <div className="queue-info">
           <div className="info-card">
-            <div className="info-label">Your Position</div>
+            <div className="info-label">Your Number</div>
             <div className="info-value">
-              {position !== null ? `#${position}` : 'Calculating...'}
+              {position !== null ? `#${position}` : 'Loading...'}
             </div>
           </div>
 
           <div className="info-card">
-            <div className="info-label">Estimated Wait</div>
+            <div className="info-label">Wait Time</div>
             <div className="info-value">
-              {estimatedWait !== null ? `${estimatedWait} min` : 'Calculating...'}
+              {estimatedWait !== null ? `${estimatedWait} min` : 'Loading...'}
             </div>
           </div>
 
           <div className="info-card">
-            <div className="info-label">Online Pharmacists</div>
+            <div className="info-label">Doctors Online</div>
             <div className="info-value">{onlinePharmacists}</div>
           </div>
         </div>
@@ -323,8 +323,8 @@ function ConsultationQueue({ user, onEnterChat, onCancel, symptoms, symptomAsses
         </div>
 
         <div className="waiting-message">
-          <p>Please wait while a pharmacist reviews your consultation request...</p>
-          <p className="waiting-tip">You will be notified when a pharmacist accepts your request.</p>
+          <p>Please wait while a doctor reviews your request...</p>
+          <p className="waiting-tip">You will be notified when a doctor accepts your request.</p>
         </div>
 
         <button className="cancel-btn" onClick={handleCancel}>

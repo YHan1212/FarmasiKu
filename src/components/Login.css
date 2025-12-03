@@ -162,23 +162,42 @@
   transform: translateY(-2px);
 }
 
-/* Mobile optimization for Samsung S8+ */
+/* Mobile optimization for phones */
 @media (max-width: 768px) {
   .login-container {
-    padding: 15px;
+    padding: 12px;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
   }
 
   .login-card {
-    padding: 28px;
+    padding: 24px;
+    max-width: 100%;
   }
 
   .login-card h2 {
     font-size: 22px;
   }
 
+  .login-subtitle {
+    font-size: 13px;
+  }
+
+  .form-group input {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 14px;
+  }
+
   .login-button {
-    padding: 12px;
-    font-size: 15px;
+    padding: 14px;
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 48px;
+  }
+
+  .continue-guest-button {
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 48px;
+    padding: 14px;
   }
 }
 
@@ -189,15 +208,38 @@
 
   .login-card {
     padding: 20px;
+    border-radius: 12px;
   }
 
   .login-card h2 {
     font-size: 20px;
   }
 
+  .login-subtitle {
+    font-size: 12px;
+  }
+
+  .form-group input {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 12px;
+  }
+
   .login-button {
     padding: 12px;
-    font-size: 14px;
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 44px;
+  }
+
+  .continue-guest-button {
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 44px;
+    padding: 12px;
+  }
+
+  .link-button {
+    font-size: 13px;
+    padding: 4px 0;
+    min-height: 32px;
   }
 }
 

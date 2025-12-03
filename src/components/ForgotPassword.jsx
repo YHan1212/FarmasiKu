@@ -44,7 +44,7 @@ function ForgotPassword({ onBack, onSwitchToLogin }) {
             We've sent a password reset link to <strong>{email}</strong>
           </p>
           <p className="success-subtitle">
-            Please check your inbox and click the link to reset your password.
+            Please check your email and click the link to reset your password.
           </p>
           <button 
             className="back-to-login-button"
@@ -62,7 +62,7 @@ function ForgotPassword({ onBack, onSwitchToLogin }) {
       <div className="forgot-password-card">
         <h2>Reset Password</h2>
         <p className="forgot-password-subtitle">
-          Enter your email address and we'll send you a link to reset your password
+          Enter your email and we'll send you a link to reset your password
         </p>
 
         {error && (
@@ -73,7 +73,7 @@ function ForgotPassword({ onBack, onSwitchToLogin }) {
 
         <form onSubmit={handleSubmit} className="forgot-password-form">
           <div className="form-group">
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="email">Email</label>
             <input
               id="email"
               type="email"

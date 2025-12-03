@@ -307,19 +307,83 @@
   color: #64748B;
 }
 
-/* 移动端响应式 */
+/* Mobile responsive for phones */
 @media (max-width: 768px) {
   .address-management {
-    padding: 16px;
+    padding: 12px;
+    max-width: 100%;
+  }
+
+  .address-management h2 {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+
+  .address-card {
+    padding: 12px;
+  }
+
+  .address-label {
+    font-size: 14px;
   }
 
   .form-row {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .address-form-container {
-    padding: 20px;
-    margin: 10px;
+    padding: 16px;
+    margin: 8px;
+    max-width: calc(100vw - 16px);
+  }
+
+  .address-form-container h3 {
+    font-size: 18px;
+  }
+
+  .form-group label {
+    font-size: 13px;
+  }
+
+  .form-group input,
+  .form-group select {
+    padding: 12px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .form-actions button {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .address-management {
+    padding: 10px;
+  }
+
+  .address-management h2 {
+    font-size: 18px;
+  }
+
+  .address-card {
+    padding: 10px;
+  }
+
+  .address-form-container {
+    padding: 14px;
+    margin: 5px;
+  }
+
+  .form-group input,
+  .form-group select {
+    font-size: 16px; /* Prevents zoom on iOS */
   }
 }
 

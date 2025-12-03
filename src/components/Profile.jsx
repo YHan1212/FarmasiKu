@@ -90,12 +90,14 @@ function Profile({ user, onLogout, onRestartFlow, onTrackOrder }) {
       console.log('Update result:', data)
 
       // Reload orders with a small delay to ensure database is updated
-      setTimeout(async () => {
-        await loadUserData()
-        alert('Order confirmed as delivered!')
-      }, 500)
+      setLoading(true)
+      await loadUserData()
+      // Show loading for at least 1.5 seconds
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      setLoading(false)
     } catch (error) {
       console.error('Error confirming delivery:', error)
+      setLoading(false)
       const errorMessage = error.message || 'Unknown error'
       alert(`Failed to confirm delivery: ${errorMessage}\n\nPlease check the browser console for more details.`)
     }
@@ -174,11 +176,14 @@ function Profile({ user, onLogout, onRestartFlow, onTrackOrder }) {
       if (profileError) throw profileError
 
       // Reload data
+      setLoading(true)
       await loadUserData()
+      // Show loading for at least 1.5 seconds
+      await new Promise(resolve => setTimeout(resolve, 1500))
       setEditingProfile(false)
-      alert('Profile updated successfully!')
     } catch (error) {
       console.error('Error updating profile:', error)
+      setLoading(false)
       alert(`Failed to update profile: ${error.message || 'Unknown error'}`)
     }
   }

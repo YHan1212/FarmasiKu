@@ -35,9 +35,9 @@ function MedicationRecommendation({ symptoms, medications, userAge, onOrder }) {
   return (
     <div className="medication-recommendation">
       <div className="question-container">
-        <h2 className="question-title">Medication Recommendation</h2>
+        <h2 className="question-title">Medicine Suggestions</h2>
         <p className="question-subtitle">
-          Based on your symptoms{userAge && ` and age (${userAge} years)`}, we recommend the following medications
+          Based on your symptoms{userAge && ` and age (${userAge} years)`}, we suggest the following medicines
         </p>
       </div>
 
@@ -67,7 +67,7 @@ function MedicationRecommendation({ symptoms, medications, userAge, onOrder }) {
                   <h3 className="medication-name">
                     {medication.name}
                     {medication.isChildAlternative && (
-                      <span className="alternative-badge">Child-Safe Alternative</span>
+                      <span className="alternative-badge">Safe for Children</span>
                     )}
                   </h3>
                   {medication.ageCategory && (
@@ -95,7 +95,7 @@ function MedicationRecommendation({ symptoms, medications, userAge, onOrder }) {
                   className="restricted-button"
                   disabled={true}
                 >
-                  Consult Doctor First
+                  See Doctor First
                 </button>
               )}
             </div>
@@ -106,21 +106,21 @@ function MedicationRecommendation({ symptoms, medications, userAge, onOrder }) {
       {selectedMedications.length > 0 && (
         <div className="selection-summary">
           <div className="summary-info">
-            <span className="selected-count">{selectedMedications.length} medication(s) selected</span>
+            <span className="selected-count">{selectedMedications.length} medicine(s) selected</span>
             <span className="total-price">Total: RM {totalPrice.toFixed(2)}</span>
           </div>
           <button
             className="proceed-button"
             onClick={handleProceedToPayment}
           >
-            Proceed to Payment
+            Continue to Payment
           </button>
         </div>
       )}
 
       {medications.length === 0 && (
         <div className="no-medications">
-          <p>Sorry, no medications available</p>
+          <p>Sorry, no medicines available</p>
         </div>
       )}
     </div>

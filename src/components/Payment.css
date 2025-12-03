@@ -279,8 +279,13 @@
   opacity: 0.8;
 }
 
-/* Mobile optimization for Samsung S8+ */
+/* Mobile responsive for phones */
 @media (max-width: 768px) {
+  .payment {
+    padding: 12px;
+    max-width: 100%;
+  }
+
   .question-container {
     margin-bottom: 1.5rem;
   }
@@ -298,13 +303,29 @@
     padding: 1.25rem;
   }
 
-  .primary-button {
-    padding: 0.9rem 1.5rem;
-    font-size: 1rem;
+  .form-group input,
+  .ewallet-select {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 12px;
+  }
+
+  .method-button {
+    min-height: 48px;
+    font-size: 14px;
+  }
+
+  .back-button,
+  .pay-button {
+    min-height: 48px;
+    font-size: 16px; /* Prevents zoom on iOS */
   }
 }
 
 @media (max-width: 480px) {
+  .payment {
+    padding: 10px;
+  }
+
   .question-title {
     font-size: 1.25rem;
   }
@@ -317,9 +338,21 @@
   .payment-form-container {
     padding: 1rem;
   }
+
+  .form-group input,
+  .ewallet-select {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 12px;
+  }
   
   .method-options {
     flex-direction: column;
+    gap: 10px;
+  }
+
+  .method-button {
+    width: 100%;
+    min-height: 48px;
   }
   
   .form-row {
@@ -329,11 +362,14 @@
   
   .payment-actions {
     flex-direction: column;
+    gap: 12px;
   }
 
-  .primary-button {
-    padding: 0.875rem 1.25rem;
-    font-size: 0.95rem;
+  .back-button,
+  .pay-button {
+    width: 100%;
+    min-height: 48px;
+    font-size: 16px; /* Prevents zoom on iOS */
   }
 }
 

@@ -7,7 +7,6 @@ import SymptomAssessment from './components/SymptomAssessment'
 import MedicationRecommendation from './components/MedicationRecommendation'
 import Payment from './components/Payment'
 import DeliveryInfo from './components/DeliveryInfo'
-import NotificationCenter from './components/NotificationCenter'
 import OrderTracking from './components/OrderTracking'
 import OrderSuccess from './components/OrderSuccess'
 import ProgressIndicator from './components/ProgressIndicator'
@@ -48,7 +47,6 @@ function App() {
   const [currentConsultationSession, setCurrentConsultationSession] = useState(null) // Current chat session
   const [deliveryInfo, setDeliveryInfo] = useState(null) // Store delivery address and phone
   const [consultationQueue, setConsultationQueue] = useState(null) // Current consultation queue
-  const [showNotifications, setShowNotifications] = useState(false) // Show notification center
   const [trackingOrderId, setTrackingOrderId] = useState(null) // Order ID for tracking
 
   // Check authentication status on mount
@@ -883,9 +881,10 @@ function App() {
             <button 
               className="profile-button"
               onClick={handleShowProfile}
-              title={user.email}
+              title={`Profile: ${user.email}`}
             >
-              {user.user_metadata?.name || user.email?.split('@')[0] || 'Admin'}
+              <span className="profile-emoji">👤</span>
+              <span>{user.user_metadata?.name || user.email?.split('@')[0] || 'Admin'}</span>
             </button>
             <button 
               className="logout-button-header"
@@ -904,18 +903,12 @@ function App() {
           <h1>farmasiKu</h1>
           <div className="user-menu">
             <button 
-              className="notification-button"
-              onClick={() => setShowNotifications(true)}
-              title="Notifications"
-            >
-              🔔
-            </button>
-            <button 
               className="profile-button"
               onClick={handleShowProfile}
-              title={user.email}
+              title={`Profile: ${user.email}`}
             >
-              {user.user_metadata?.name || user.email?.split('@')[0] || 'User'}
+              <span className="profile-emoji">👤</span>
+              <span>{user.user_metadata?.name || user.email?.split('@')[0] || 'User'}</span>
             </button>
           </div>
         </header>
@@ -1109,13 +1102,6 @@ function App() {
               setStep('profile')
               setTrackingOrderId(null)
             }}
-          />
-        )}
-
-        {showNotifications && user && (
-          <NotificationCenter
-            user={user}
-            onClose={() => setShowNotifications(false)}
           />
         )}
 

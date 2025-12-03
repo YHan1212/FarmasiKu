@@ -191,19 +191,100 @@
   color: #666;
 }
 
-/* Responsive */
+/* Mobile responsive for phones */
 @media (max-width: 768px) {
   .pharmacist-dashboard {
-    padding: 10px;
+    padding: 12px;
+    max-width: 100%;
   }
 
   .pharmacist-header {
     flex-direction: column;
     gap: 15px;
     align-items: flex-start;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+  }
+
+  .pharmacist-header h2 {
+    font-size: 20px;
+  }
+
+  .online-status {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .status-toggle {
+    min-height: 44px;
+    font-size: 14px;
+    padding: 10px 16px;
+  }
+
+  .section {
+    padding: 16px;
+  }
+
+  .section h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+
+  .queue-card, .session-card {
+    padding: 12px;
+  }
+
+  .queue-actions {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .accept-btn,
+  .open-chat-btn {
+    width: 100%;
+    min-height: 44px;
+    font-size: 14px;
+    padding: 12px 20px;
+  }
+
+  .back-btn {
+    min-height: 44px;
+    font-size: 14px;
+    padding: 10px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pharmacist-dashboard {
+    padding: 10px;
+  }
+
+  .pharmacist-header h2 {
+    font-size: 18px;
+  }
+
+  .section {
+    padding: 12px;
+  }
+
+  .section h3 {
+    font-size: 16px;
   }
 
   .queue-card, .session-card {
     padding: 10px;
+  }
+
+  .queue-patient, .session-patient {
+    font-size: 14px;
+  }
+
+  .accept-btn,
+  .open-chat-btn,
+  .back-btn {
+    min-height: 44px;
+    font-size: 13px;
+    padding: 10px 14px;
   }
 }

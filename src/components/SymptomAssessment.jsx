@@ -20,13 +20,13 @@ function SymptomAssessment({ symptom, onComplete, onBack }) {
   return (
     <div className="symptom-assessment">
       <div className="question-container">
-        <h2 className="question-title">Assess Your Symptom</h2>
+        <h2 className="question-title">Describe Your Symptom</h2>
         <p className="question-subtitle">Please provide details about: <strong>{symptom}</strong></p>
       </div>
 
       <div className="assessment-form">
         <div className="assessment-item">
-          <label className="assessment-label">Intensity (1-10)</label>
+          <label className="assessment-label">Severity Level (1-10)</label>
           <div className="intensity-selector">
             <input
               type="range"
