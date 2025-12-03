@@ -412,8 +412,8 @@ function AddressManagement({ user, onSelect, onContinue, selectedAddressId }) {
         </div>
       )}
 
-      {/* Continue button */}
-      {onContinue && selectedAddressId && (
+      {/* Continue button - only show if not in selection mode (when onSelect is provided, we're selecting, not managing) */}
+      {onContinue && !onSelect && selectedAddressId && (
         <div className="continue-section">
           <button className="continue-btn" onClick={onContinue}>
             Continue

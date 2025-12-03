@@ -59,33 +59,56 @@
 
 .admin-tabs {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 30px;
   flex-wrap: wrap;
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .tab {
-  background: white;
-  border: none;
-  padding: 12px 24px;
+  background: #F8FAFC;
+  border: 2px solid transparent;
+  padding: 12px 18px;
   border-radius: 10px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
-  color: #666;
+  color: #64748B;
   transition: all 0.3s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+  min-width: fit-content;
+  flex-shrink: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tab:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  background: #EFF6FF;
+  color: #3B82F6;
+  border-color: #DBEAFE;
+  transform: translateY(-1px);
 }
 
 .tab.active {
-  background: #3B82F6;
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
   color: white;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  border-color: #3B82F6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  font-weight: 600;
+}
+
+.tab-count {
+  font-size: 11px;
+  opacity: 0.9;
+  margin-left: 4px;
+}
+
+.tab.active .tab-count {
+  opacity: 1;
 }
 
 .admin-content {
@@ -105,20 +128,27 @@
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
 }
 
 .stat-card {
-  background: #EFF6FF;
-  padding: 25px;
-  border-radius: 15px;
+  background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+  padding: 28px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   gap: 20px;
   color: #1E40AF;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   border: 1px solid #DBEAFE;
+  transition: all 0.3s;
+  min-width: 0;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 .stat-card.revenue {
@@ -140,25 +170,44 @@
 .stat-icon {
   font-size: 48px;
   opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.stat-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .stat-info h3 {
   margin: 0 0 10px 0;
   font-size: 14px;
   opacity: 0.9;
-  font-weight: 500;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stat-value {
   margin: 0;
   font-size: 32px;
   font-weight: bold;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stat-subtitle {
-  margin: 5px 0 0 0;
+  margin: 8px 0 0 0;
   font-size: 12px;
   opacity: 0.8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .recent-activity {
@@ -260,6 +309,8 @@
   border-radius: 12px;
   border-left: 4px solid #667eea;
   transition: all 0.3s;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .order-card-admin:hover {
@@ -272,12 +323,22 @@
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 15px;
+  gap: 15px;
+  min-width: 0;
+}
+
+.order-header-admin > *:first-child {
+  flex: 1;
+  min-width: 0;
 }
 
 .order-header-admin h3 {
   margin: 0 0 5px 0;
   color: #333;
   font-size: 16px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 .order-date {
@@ -335,15 +396,30 @@
   background: white;
   border-radius: 6px;
   font-size: 14px;
+  gap: 12px;
+  min-width: 0;
+}
+
+.order-item-admin > * {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .item-name {
   color: #333;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .item-price {
   color: #3B82F6;
   font-weight: 500;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .delivery-info-section {
@@ -527,12 +603,18 @@
   padding: 20px;
   border-radius: 12px;
   border-left: 4px solid #43e97b;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  min-width: 0;
 }
 
 .user-info h3 {
   margin: 0 0 10px 0;
   color: #333;
   font-size: 16px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 .user-info p {
@@ -682,6 +764,8 @@
   border-radius: 12px;
   border-left: 4px solid #4facfe;
   transition: all 0.3s;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .medication-card.out-of-stock {
@@ -701,12 +785,21 @@
   align-items: flex-start;
   margin-bottom: 15px;
   gap: 15px;
+  min-width: 0;
+}
+
+.medication-header > *:first-child {
+  flex: 1;
+  min-width: 0;
 }
 
 .medication-header h3 {
   margin: 0 0 5px 0;
   color: #333;
   font-size: 16px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 .medication-id {
@@ -721,6 +814,8 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 8px;
+  flex-shrink: 0;
+  min-width: 0;
 }
 
 .medication-price {
@@ -1020,6 +1115,8 @@
   border-radius: 12px;
   border-left: 4px solid #4facfe;
   transition: all 0.3s;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .doctor-card.unavailable {
@@ -1038,12 +1135,21 @@
   align-items: flex-start;
   margin-bottom: 15px;
   gap: 15px;
+  min-width: 0;
+}
+
+.doctor-header > *:first-child {
+  flex: 1;
+  min-width: 0;
 }
 
 .doctor-header h3 {
   margin: 0 0 5px 0;
   color: #333;
   font-size: 18px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 .doctor-specialization {
@@ -1217,6 +1323,10 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .admin-container {
+    padding: 12px;
+  }
+
   .admin-header {
     padding: 15px 20px;
   }
@@ -1231,6 +1341,10 @@
     width: 100%;
   }
 
+  .admin-title h1 {
+    font-size: 22px;
+  }
+
   .back-button {
     align-self: flex-end;
     width: 100%;
@@ -1239,10 +1353,37 @@
   .admin-tabs {
     overflow-x: auto;
     flex-wrap: nowrap;
+    padding: 12px;
+    gap: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tab {
+    padding: 10px 16px;
+    font-size: 13px;
+    white-space: nowrap;
+    min-width: fit-content;
+  }
+
+  .admin-content {
+    padding: 20px;
   }
 
   .stats-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .stat-card {
+    padding: 20px;
+  }
+
+  .stat-icon {
+    font-size: 40px;
+  }
+
+  .stat-value {
+    font-size: 28px;
   }
 
   .filters {
@@ -1255,8 +1396,58 @@
   }
 
   .users-list,
-  .medications-list {
+  .medications-list,
+  .doctors-list {
     grid-template-columns: 1fr;
+  }
+
+  .order-card-admin,
+  .medication-card,
+  .doctor-card {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-container {
+    padding: 10px;
+  }
+
+  .admin-header {
+    padding: 12px 16px;
+  }
+
+  .admin-title h1 {
+    font-size: 20px;
+  }
+
+  .admin-tabs {
+    padding: 10px;
+    gap: 6px;
+  }
+
+  .tab {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .admin-content {
+    padding: 16px;
+  }
+
+  .stat-card {
+    padding: 16px;
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .stat-icon {
+    font-size: 36px;
+  }
+
+  .stat-value {
+    font-size: 24px;
   }
 }
 

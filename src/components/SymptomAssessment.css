@@ -106,13 +106,15 @@
 }
 
 .duration-number {
-  width: 80px;
+  width: 100px;
+  min-width: 100px;
   padding: 0.75rem;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
   font-size: 1rem;
   text-align: center;
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .duration-number:focus {
@@ -123,6 +125,7 @@
 
 .duration-unit {
   flex: 1;
+  min-width: 120px;
   padding: 0.75rem;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
@@ -130,6 +133,9 @@
   background: white;
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .duration-unit:focus {

@@ -785,20 +785,23 @@ function FarmasiAdmin({ user, onBack, onLogout }) {
         <button
           className={`tab ${activeTab === 'orders' ? 'active' : ''}`}
           onClick={() => setActiveTab('orders')}
+          title={`Orders (${stats.totalOrders})`}
         >
-          📦 Orders ({stats.totalOrders})
+          📦 Orders <span className="tab-count">({stats.totalOrders})</span>
         </button>
         <button
           className={`tab ${activeTab === 'users' ? 'active' : ''}`}
           onClick={() => setActiveTab('users')}
+          title={`Users (${stats.totalUsers})`}
         >
-          👥 Users ({stats.totalUsers})
+          👥 Users <span className="tab-count">({stats.totalUsers})</span>
         </button>
         <button
           className={`tab ${activeTab === 'consultations' ? 'active' : ''}`}
           onClick={() => setActiveTab('consultations')}
+          title={`Consultations (${stats.totalConsultations})`}
         >
-          💬 Consultations ({stats.totalConsultations})
+          💬 Consults <span className="tab-count">({stats.totalConsultations})</span>
         </button>
         <button
           className={`tab ${activeTab === 'medications' ? 'active' : ''}`}
@@ -809,8 +812,9 @@ function FarmasiAdmin({ user, onBack, onLogout }) {
         <button
           className={`tab ${activeTab === 'doctors' ? 'active' : ''}`}
           onClick={() => setActiveTab('doctors')}
+          title={`Pharmacists (${doctors.length})`}
         >
-          👨‍⚕️ Pharmacists ({doctors.length})
+          👨‍⚕️ Pharmacists <span className="tab-count">({doctors.length})</span>
         </button>
         <button
           className={`tab ${activeTab === 'pharmacist' ? 'active' : ''}`}
@@ -820,8 +824,9 @@ function FarmasiAdmin({ user, onBack, onLogout }) {
             setActiveTab('pharmacist')
             console.log('🔵 [FarmasiAdmin] activeTab set to: pharmacist')
           }}
+          title="Pharmacist Dashboard"
         >
-          💬 Pharmacist Dashboard
+          💬 Pharm Dashboard
         </button>
       </div>
 
