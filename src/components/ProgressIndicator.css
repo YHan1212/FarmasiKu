@@ -14,10 +14,13 @@
 }
 
 .progress-bar {
-  height: 100%;
-  background: #3B82F6;
+  height: 8px;
+  width: 0%;
+  background: #2563EB !important;
   transition: width 0.3s ease;
   border-radius: 4px;
+  min-width: 0;
+  display: block;
 }
 
 @media (max-width: 480px) {
