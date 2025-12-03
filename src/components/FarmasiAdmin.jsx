@@ -746,29 +746,21 @@ function FarmasiAdmin({ user, onBack, onLogout }) {
             <h1>🏥 farmasiKu Admin</h1>
             <p>Management Dashboard</p>
           </div>
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <div className="admin-header-actions">
             {onBack && (
-              <button className="back-button" onClick={onBack}>
-                ← Back to App
+              <button className="admin-back-button" onClick={onBack} title="Back to App">
+                <span className="button-icon">←</span>
+                <span className="button-text">Back</span>
               </button>
             )}
             {onLogout && (
               <button 
-                className="logout-button-header" 
+                className="admin-logout-button" 
                 onClick={onLogout}
-                style={{
-                  background: '#EF4444',
-                  color: 'white',
-                  border: 'none',
-                  padding: '10px 20px',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  transition: 'all 0.3s'
-                }}
+                title="Logout"
               >
-                🚪 Logout
+                <span className="button-icon">🚪</span>
+                <span className="button-text">Logout</span>
               </button>
             )}
           </div>

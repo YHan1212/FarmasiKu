@@ -429,14 +429,19 @@
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  width: 100%;
 }
 
 .duration-number-input {
-  flex: 1;
+  width: 80px;
+  min-width: 80px;
+  max-width: 100px;
+  flex-shrink: 0;
   padding: 0.75rem;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
   font-size: 1rem;
+  text-align: center;
   transition: border-color 0.3s;
 }
 
@@ -447,13 +452,17 @@
 
 .duration-unit-select {
   flex: 1;
-  padding: 0.75rem;
+  min-width: 0;
+  padding: 0.75rem 0.5rem;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   background: white;
   cursor: pointer;
   transition: border-color 0.3s;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .duration-unit-select:focus {
@@ -598,9 +607,23 @@
     width: 100%;
   }
 
-  .duration-input-group input {
+  .duration-input-group {
+    gap: 0.5rem;
+  }
+
+  .duration-number-input {
+    width: 70px;
+    min-width: 70px;
+    max-width: 80px;
     font-size: 16px; /* Prevents zoom on iOS */
-    padding: 12px;
+    padding: 12px 8px;
+  }
+
+  .duration-unit-select {
+    font-size: 14px;
+    padding: 12px 8px;
+    flex: 1;
+    min-width: 0;
   }
 
   .frequency-buttons {
