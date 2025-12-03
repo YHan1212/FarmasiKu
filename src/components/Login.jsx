@@ -63,6 +63,32 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToForgotPassword }) {
 
   return (
     <div className="login-container">
+      <div className="login-intro">
+        <div className="intro-content">
+          <h1 className="intro-title">🏥 Welcome to farmasiKu</h1>
+          <p className="intro-description">
+            Your trusted online pharmacy platform for convenient medicine ordering and delivery
+          </p>
+          <div className="intro-features">
+            <div className="feature-item">
+              <span className="feature-icon">💊</span>
+              <span className="feature-text">Easy Medicine Ordering</span>
+            </div>
+            <div className="feature-item">
+              <span className="feature-icon">🚚</span>
+              <span className="feature-text">Fast Delivery</span>
+            </div>
+            <div className="feature-item">
+              <span className="feature-icon">👨‍⚕️</span>
+              <span className="feature-text">Doctor Consultation</span>
+            </div>
+            <div className="feature-item">
+              <span className="feature-icon">📱</span>
+              <span className="feature-text">Track Your Orders</span>
+            </div>
+          </div>
+        </div>
+      </div>
       <div className="login-card">
         <h2>Login to farmasiKu</h2>
         <p className="login-subtitle">Access your orders and medicine history</p>
