@@ -73,9 +73,9 @@
 
 .address-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .address-label-row {
@@ -106,6 +106,12 @@
 .address-actions {
   display: flex;
   gap: 8px;
+  width: 100%;
+}
+
+.address-actions .edit-btn,
+.address-actions .delete-btn {
+  flex: 1;
 }
 
 .edit-btn,
