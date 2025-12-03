@@ -35,8 +35,8 @@ function DeliveryInfo({ user, onContinue, onBack }) {
   return (
     <div className="delivery-info">
       <div className="delivery-info-header">
-        <h2>Delivery Address</h2>
-        <p className="subtitle">Please select your delivery address and phone number</p>
+        <h2>📍 Select Delivery Address</h2>
+        <p className="subtitle">Choose your delivery address and phone number</p>
       </div>
 
       <div className="delivery-content">
@@ -48,18 +48,18 @@ function DeliveryInfo({ user, onContinue, onBack }) {
       </div>
 
       <div className="delivery-actions">
-        {onBack && (
-          <button className="back-btn" onClick={onBack}>
-            Back
-          </button>
-        )}
         <button
           className="continue-btn"
           onClick={handleContinue}
           disabled={!selectedAddress}
         >
-          Continue to Payment
+          {selectedAddress ? '✓ Continue to Payment' : 'Select an address to continue'}
         </button>
+        {onBack && (
+          <button className="back-btn" onClick={onBack}>
+            ← Back
+          </button>
+        )}
       </div>
     </div>
   )
